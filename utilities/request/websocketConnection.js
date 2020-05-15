@@ -64,6 +64,7 @@ class Widgets {
   parseRates(msg) {
     this.quotesRate[msg.FROMSYMBOL] = {
       price: msg.PRICE,
+      widgetName: msg.FROMSYMBOL,
       fullName: msg.FROMSYMBOL + msg.TOSYMBOL,
       lastUpdate: msg.LASTUPDATE,
     };

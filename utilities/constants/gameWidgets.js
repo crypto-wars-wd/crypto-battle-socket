@@ -1,20 +1,20 @@
 const config = require('config');
 
 exports.gameWidgets = [
-  `${config.widgets.server}~DASH~USD`,
-  `${config.widgets.server}~EOS~USD`,
-  `${config.widgets.server}~WAVES~USD`,
-  `${config.widgets.server}~BTC~USD`,
-  `${config.widgets.server}~ETC~USD`,
-  `${config.widgets.server}~BCH~USD`,
-  `${config.widgets.server}~BAT~USD`,
-  `${config.widgets.server}~ETH~USD`,
-  `${config.widgets.server}~ZEC~USD`,
-  `${config.widgets.server}~LTC~USD`,
-  `${config.widgets.server}~XLM~USD`,
-  `${config.widgets.server}~XRP~USD`,
-  `${config.widgets.server}~OMG~USD`,
-  `${config.widgets.server}~NEO~USD`,
-  `${config.widgets.server}~XMR~USD`,
-//add Altcoin index, IOT
+  `${config.widgets.server.bitfinex}~DASH~USD`,
+  `${config.widgets.server.bitfinex}~EOS~USD`,
+  `${config.widgets.server.bitfinex}~BTC~USD`,
+  `${config.widgets.server.bitfinex}~ETC~USD`,
+  `${config.widgets.server.bitfinex}~BCH~USD`,
+  `${config.widgets.server.bitfinex}~BAT~USD`,
+  `${config.widgets.server.bitfinex}~ETH~USD`,
+  `${config.widgets.server.bitfinex}~ZEC~USD`,
+  `${config.widgets.server.bitfinex}~LTC~USD`,
+  `${config.widgets.server.bitfinex}~XRP~USD`,
+  `${config.widgets.server.bitfinex}~NEO~USD`,
+  `${config.widgets.server.bitfinex}~XMR~USD`,
+  `${config.widgets.server.bitfinex}~ZRX~USD`,
+  `${config.widgets.server.P2PB2B}~WAVES~USD`,
+    //add ICON, METAL
+// altcoin, iota, stellar, omisego, usd coin, fantom, energi, videocoin, beaxy
 ];
