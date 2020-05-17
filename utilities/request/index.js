@@ -1,3 +1,4 @@
 const widgetsQuotes = require('./websocketConnection');
+const axiosRequest = require('./axiosRequests');
 
-module.exports = { widgetsQuotes };
+module.exports = { widgetsQuotes, axiosRequest };

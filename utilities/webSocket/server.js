@@ -1,26 +1,28 @@
 const SocketServer = require('ws').Server;
 const _ = require('lodash');
 const GameProcess = require('utilities/helper/gameProcess');
+const { axiosRequest } = require('utilities/request');
 
 const wss = new SocketServer({ port: 4000, path: '/start' });
 
-const sendSomethingWrong = ({ ws, battle, error }) => {
+const sendSomethingWrong = ({ ws, call, error }) => {
   ws.send(
     JSON.stringify({
       error: {
-        battleID: _.get(battle, '_id', 'not found'),
+        playerID: _.get(call, 'params.playerID', 'not found'),
         result: {},
-        error,
+        message: error,
       },
     }),
   );
 };
 
-const sendStatusBattle = ({ battle, status }) => {
+const sendStateBattle = ({ method, battle }) => {
   wss.clients.forEach((player) => {
     player.send(
       JSON.stringify({
-        battle: { battleID: battle._id, status },
+        method,
+        battle,
       }),
     );
   });
@@ -39,6 +41,30 @@ const sendMessagesBattle = ({ battle, game }) => {
   });
 };
 
+const connectBattle = ({ call, ws }) => {
+  if (call.params.cryptoName && call.params.playerID && call.params.battleID) {
+    const body = {
+      cryptoName: call.params.cryptoName,
+      playerID: call.params.playerID,
+      battleID: call.params.battleID,
+    };
+    return axiosRequest('http://localhost:3001/api/connect-battle', body);
+  }
+  sendSomethingWrong({ call, ws, error: 'error params' });
+};
+
+const createBattle = ({ call, ws }) => {
+  if (call.params.cryptoName && call.params.playerID && call.params.healthPoints) {
+    const body = {
+      cryptoName: call.params.cryptoName,
+      playerID: call.params.playerID,
+      healthPoints: call.params.healthPoints,
+    };
+    return axiosRequest('http://localhost:3001/api/create-battle', body);
+  }
+  sendSomethingWrong({ call, ws, error: 'error params' });
+};
+
 const startGame = ({ battle }) => {
   const game = new GameProcess({
     firstWarrior: battle.playersInfo.firstPlayer,
@@ -47,10 +73,6 @@ const startGame = ({ battle }) => {
   });
   game.start();
   const gameProcess = setInterval(async () => {
-    if (_.isEmpty(wss.clients)) {
-      clearInterval(gameProcess);
-      return console.log('All ws clients exit');
-    }
     if (!_.isEmpty(game.getStepStatus())) {
       sendMessagesBattle({ battle, game });
       if (game.getStepStatus().gameStatus === 'CLOSED') {
@@ -74,24 +96,22 @@ class WebSoket {
         } catch (error) {
           console.error('Error WS parse JSON message', message, error);
         }
-        if (call.battle && call.battle.gameStatus === 'WAITING') {
-          ws.battle = call.battle._id;
-          ws.playerID = call.battle.playersInfo.firstPlayer.playerID;
-          sendStatusBattle({ battle: call.battle, status: 'WAITING' });
-          return console.log(`Battle ${call.battle._id} created`);
-        } if (call.battle && call.battle.gameStatus === 'START') {
-          wss.clients.forEach((player) => {
-            if (player.battle === call.battle._id && player.playerID === call.battle.playersInfo.firstPlayer.playerID) {
-              ws.battle = call.battle._id;
-              ws.playerID = call.battle.playersInfo.secondPlayer.playerID;
-              sendStatusBattle({ battle: call.battle, status: 'START' });
-              startGame({ battle: call.battle });
-              return console.log(`Battle ${call.battle._id} started`);
-            }
-          });
+        if (call.method === 'create_battle' && call.params) {
+          const { result, error } = await createBattle({ call, ws });
+          if (error) console.error(error);
+          if (result.battle) sendStateBattle({ method: 'create_battle', battle: result.battle });
 
+          ws.battle = result.battle._id;
+        } else if (call.method === 'connect_battle' && call.params) {
+          const { result, error } = await connectBattle({ call, ws });
+          if (error) console.error(error);
+          if (result.battle) sendStateBattle({ method: 'start_battle', battle: result.battle });
+
+          ws.battle = result.battle._id;
+          startGame({ battle: result.battle });
+          return console.log(`Battle ${result.battle._id} started`);
         } else {
-          sendSomethingWrong({ battle: call.battle, ws, error: 'Something is wrong' });
+          sendSomethingWrong({ call, ws, error: 'Something is wrong' });
         }
       });
     });
