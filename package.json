@@ -9,7 +9,6 @@
     "node": "8.x"
   },
   "dependencies": {
-    "-": "0.0.1",
     "@hapi/joi": "^17.1.1",
     "axios": "^0.19.2",
     "bluebird": "^3.7.2",

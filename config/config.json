@@ -6,6 +6,9 @@
       "server": {
         "bitfinex": "2~Bitfinex",
         "binance": "2~Binance"
+      },
+      "redis": {
+        "widgetsRate": 1
       }
     }
   },
@@ -19,6 +22,9 @@
         "P2PB2B": "2~P2PB2B"
       }
     },
+    "redis": {
+      "widgetsRate": 1
+    }
   },
   "test": {
     "widgetsBeaxy": {
@@ -28,6 +34,9 @@
         "bitfinex": "2~Bitfinex",
         "binance": "2~Binance"
       }
+    },
+    "redis": {
+      "widgetsRate": 1
     }
   }
 }

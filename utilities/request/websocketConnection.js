@@ -1,17 +1,16 @@
 const config = require('config');
 const WebSocket = require('ws');
 const moment = require('moment');
+const { addActualWidgetRate } = require('utilities/redis/redisHelper');
 const { gameWidgets } = require('utilities/constants');
 
 class Widgets {
   constructor(urlConnection, apiKey) {
     this.urlConnection = urlConnection + apiKey;
     this._webSocket = null;
-    this.quotesRate = {};
   }
 
-  createWebSocketConnection() {
-    console.log(`Socket createWebSocketConnect, ${moment().format()}`);
+  async createWebSocketConnection() {
     this._webSocket = new WebSocket(this.urlConnection);
     this._webSocket.onopen = (evt) => {
       console.log(`Socket onConnect, ${moment().format()}, target: `, evt.target.url);
@@ -24,8 +23,8 @@ class Widgets {
       console.log(`Socket onClose, ${moment().format()}, code: `, evt.code);
       this.onClose();
     };
-    this._webSocket.onmessage = (evt) => {
-      this.onWebSocketMessage(evt.data);
+    this._webSocket.onmessage = async (evt) => {
+      await this.onWebSocketMessage(evt.data);
     };
   }
 
@@ -39,12 +38,12 @@ class Widgets {
   }
 
 
-  onWebSocketMessage(data) {
+  async onWebSocketMessage(data) {
     const msg = JSON.parse(data.trim());
     if (msg.TYPE && msg.PRICE) {
       switch (msg.TYPE) {
         case '2':
-          this.parseRates(msg);
+          await this.updateInDataBase(msg);
           break;
         default:
           break;
@@ -61,13 +60,14 @@ class Widgets {
     );
   }
 
-  parseRates(msg) {
-    this.quotesRate[msg.FROMSYMBOL] = {
+  async updateInDataBase(msg) {
+    const data = JSON.stringify({
       price: msg.PRICE,
       widgetName: msg.FROMSYMBOL,
       fullName: msg.FROMSYMBOL + msg.TOSYMBOL,
       lastUpdate: msg.LASTUPDATE,
-    };
+    });
+    await addActualWidgetRate({ widget: msg.FROMSYMBOL, data });
   }
 }
 

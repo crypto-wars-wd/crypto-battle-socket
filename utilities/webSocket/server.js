@@ -65,13 +65,13 @@ const createBattle = ({ call, ws }) => {
   sendSomethingWrong({ call, ws, error: 'error params' });
 };
 
-const startGame = ({ battle }) => {
-  const game = new GameProcess({
+const startGame = async ({ battle }) => {
+  const game = await new GameProcess({
     firstWarrior: battle.playersInfo.firstPlayer,
     secondWarrior: battle.playersInfo.secondPlayer,
     battle,
   });
-  game.start();
+  await game.start();
   const gameProcess = setInterval(async () => {
     if (!_.isEmpty(game.getStepStatus())) {
       sendMessagesBattle({ battle, game });
