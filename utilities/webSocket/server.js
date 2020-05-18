@@ -48,7 +48,7 @@ const connectBattle = ({ call, ws }) => {
       playerID: call.params.playerID,
       battleID: call.params.battleID,
     };
-    return axiosRequest('http://localhost:3001/api/connect-battle', body);
+    return axiosRequest('http://localhost:3001/api/connect-battle', body);//add in config
   }
   sendSomethingWrong({ call, ws, error: 'error params' });
 };
@@ -60,7 +60,7 @@ const createBattle = ({ call, ws }) => {
       playerID: call.params.playerID,
       healthPoints: call.params.healthPoints,
     };
-    return axiosRequest('http://localhost:3001/api/create-battle', body);
+    return axiosRequest('http://localhost:3001/api/create-battle', body);//add in config
   }
   sendSomethingWrong({ call, ws, error: 'error params' });
 };

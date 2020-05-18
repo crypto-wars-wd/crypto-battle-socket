@@ -2,7 +2,6 @@
   "production": {
     "widgets": {
       "socketConnection": "wss://streamer.cryptocompare.com/v2?api_key=",
-      "apiKey": "ff0dd30d773722079f90f4686f91b0d5c82061f20f17e6817f6db6a7a1e071e3",
       "server": {
         "bitfinex": "2~Bitfinex",
         "binance": "2~Binance"
@@ -15,7 +14,6 @@
   "development": {
     "widgets": {
       "socketConnection": "wss://streamer.cryptocompare.com/v2?api_key=",
-      "apiKey": "ff0dd30d773722079f90f4686f91b0d5c82061f20f17e6817f6db6a7a1e071e3",
       "server": {
         "bitfinex": "2~Bitfinex",
         "binance": "2~Binance",
@@ -29,7 +27,6 @@
   "test": {
     "widgetsBeaxy": {
       "socketConnection": "wss://wgt-srv0.beaxy",
-      "apiKey": "ff0dd30d773722079f",
       "server": {
         "bitfinex": "2~Bitfinex",
         "binance": "2~Binance"

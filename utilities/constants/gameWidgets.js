@@ -16,5 +16,4 @@ exports.gameWidgets = [
   `${config.widgets.server.bitfinex}~ZRX~USD`,
   `${config.widgets.server.P2PB2B}~WAVES~USD`,
     //add ICON, METAL
-// altcoin, iota, stellar, omisego, usd coin, fantom, energi, videocoin, beaxy
 ];
