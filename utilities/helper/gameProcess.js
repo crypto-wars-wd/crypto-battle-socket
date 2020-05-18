@@ -49,8 +49,16 @@ class GameProcess {
   getStepStatus() {
     if (this.step.gameStatus === 'CLOSED') {
       this.stop();
-      if (this.step.firstWarrior.healthPoints === 0) return { messages: `Игрок ${this.step.secondWarrior.widgetName} с треском проиграл битву!`, gameStatus: 'CLOSED' };
-      return { messages: `Игрок ${this.step.firstWarrior.widgetName} с треском проиграл битву!`, gameStatus: 'CLOSED' };
+      if (this.step.firstWarrior.healthPoints === 0) {
+        this.battle.gameStatus = 'END';
+        const resultBattle = winnerCheck({ winner: this.step.secondWarrior, looser: this.step.firstWarrior });
+        this.battle = _.assign(this.battle, resultBattle);
+        return this.battle;
+      }
+      this.battle.gameStatus = 'END';
+      const resultBattle = winnerCheck({ winner: this.step.firstWarrior, looser: this.step.secondWarrior });
+      this.battle = _.assign(this.battle, resultBattle);
+      return this.battle;
     }
     if (this.step.firstWarrior.status !== 'UNCHANGED' || this.step.secondWarrior.status !== 'UNCHANGED') {
       this.battle.steps.push(_.cloneDeep(this.step.getSteps()));
@@ -58,6 +66,17 @@ class GameProcess {
     }
   }
 }
+
+const winnerCheck = ({ winner, looser }) => ({
+  winner: {
+    playerID: winner.playerID,
+    cryptoName: winner.widgetName,
+  },
+  looser: {
+    playerID: looser.playerID,
+    cryptoName: looser.widgetName,
+  },
+});
 
 
 module.exports = GameProcess;

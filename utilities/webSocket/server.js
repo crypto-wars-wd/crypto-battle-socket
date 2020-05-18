@@ -62,7 +62,7 @@ const startGame = async ({ battle, ws }) => {
       const { result, error } = await updateStatsBattle({ battle: status, ws });
       if (error) sendMessagesBattle({ battle, game: result });
       sendMessagesBattle({ battle, game: result });
-      if (status.gameStatus === 'CLOSED') {
+      if (status.gameStatus === 'END') {
         clearInterval(gameProcess);
         return console.log('Game end');
       }

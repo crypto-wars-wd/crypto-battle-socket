@@ -31,7 +31,6 @@ class BattleStatus {
     if (this.firstWarrior.healthPoints === 0 || this.secondWarrior.healthPoints === 0) this.gameStatus = 'CLOSED';
     return {
       playersStats: [this.firstWarrior, this.secondWarrior],
-      gameStatus: this.gameStatus,
       messages: this.messages,
     };
   }
