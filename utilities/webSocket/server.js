@@ -1,7 +1,8 @@
 const SocketServer = require('ws').Server;
 const _ = require('lodash');
 const GameProcess = require('utilities/helper/gameProcess');
-const { axiosRequest } = require('utilities/request');
+const { getActualWidgetsRate } = require('utilities/redis/redisHelper');
+const { createBattle, connectBattle, updateStatsBattle } = require('utilities/helper/axiosRequestHelper');
 
 const wss = new SocketServer({ port: 4000, path: '/start' });
 
@@ -34,48 +35,34 @@ const sendMessagesBattle = ({ battle, game }) => {
     if (player.battle === battle._id) {
       player.send(
         JSON.stringify({
-          messages: game.getStepStatus(),
+          messages: game,
         }),
       );
     }
   });
 };
 
-const connectBattle = ({ call, ws }) => {
-  if (call.params.cryptoName && call.params.playerID && call.params.battleID) {
-    const body = {
-      cryptoName: call.params.cryptoName,
-      playerID: call.params.playerID,
-      battleID: call.params.battleID,
-    };
-    return axiosRequest('http://localhost:3001/api/connect-battle', body);//add in config
-  }
-  sendSomethingWrong({ call, ws, error: 'error params' });
-};
 
-const createBattle = ({ call, ws }) => {
-  if (call.params.cryptoName && call.params.playerID && call.params.healthPoints) {
-    const body = {
-      cryptoName: call.params.cryptoName,
-      playerID: call.params.playerID,
-      healthPoints: call.params.healthPoints,
-    };
-    return axiosRequest('http://localhost:3001/api/create-battle', body);//add in config
-  }
-  sendSomethingWrong({ call, ws, error: 'error params' });
-};
-
-const startGame = async ({ battle }) => {
-  const game = await new GameProcess({
+const startGame = async ({ battle, ws }) => {
+  const game = new GameProcess({
     firstWarrior: battle.playersInfo.firstPlayer,
     secondWarrior: battle.playersInfo.secondPlayer,
+    widgetCurrentPrice: [
+      (await getActualWidgetsRate(battle.playersInfo.firstPlayer.cryptoName)).price,
+      (await getActualWidgetsRate(battle.playersInfo.secondPlayer.cryptoName)).price,
+    ],
     battle,
   });
   await game.start();
+
   const gameProcess = setInterval(async () => {
-    if (!_.isEmpty(game.getStepStatus())) {
-      sendMessagesBattle({ battle, game });
-      if (game.getStepStatus().gameStatus === 'CLOSED') {
+    await game.nextStep();
+    const status = game.getStepStatus();
+    if (!_.isEmpty(status)) {
+      const { result, error } = await updateStatsBattle({ battle: status, ws });
+      if (error) sendMessagesBattle({ battle, game: result });
+      sendMessagesBattle({ battle, game: result });
+      if (status.gameStatus === 'CLOSED') {
         clearInterval(gameProcess);
         return console.log('Game end');
       }
@@ -108,7 +95,7 @@ class WebSoket {
           if (result.battle) sendStateBattle({ method: 'start_battle', battle: result.battle });
 
           ws.battle = result.battle._id;
-          startGame({ battle: result.battle });
+          startGame({ battle: result.battle, ws });
           return console.log(`Battle ${result.battle._id} started`);
         } else {
           sendSomethingWrong({ call, ws, error: 'Something is wrong' });

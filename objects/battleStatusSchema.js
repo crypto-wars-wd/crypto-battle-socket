@@ -5,7 +5,6 @@ class BattleStatus {
     this.firstWarrior = firstWarrior;
     this.secondWarrior = secondWarrior;
     this.messages = '';
-    this.battleStatistics = {};
     this.gameStatus = 'OPEN';
   }
 
@@ -26,11 +25,6 @@ class BattleStatus {
       this.secondWarrior.healthPoints--;
       this.messages += messages.getHit(this.secondWarrior.widgetName);
     }
-    if (this.secondWarrior.status !== 'UNCHANGED' || this.firstWarrior.status !== 'UNCHANGED') this.saveStepInStatistics();
-  }
-
-  saveStepInStatistics() {
-    this.battleStatistics[`Step ${this.battleStatistics.length}`] = this.getSteps();
   }
 
   getSteps() {
@@ -40,10 +34,6 @@ class BattleStatus {
       gameStatus: this.gameStatus,
       messages: this.messages,
     };
-  }
-
-  getStatistics() {
-    return { battleStatistics: this.battleStatistics };
   }
 }
 
