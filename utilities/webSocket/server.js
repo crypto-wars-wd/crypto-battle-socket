@@ -2,7 +2,9 @@ const SocketServer = require('ws').Server;
 const _ = require('lodash');
 const GameProcess = require('utilities/helper/gameProcess');
 const { getActualWidgetsRate } = require('utilities/redis/redisHelper');
-const { createBattle, connectBattle, updateStatsBattle } = require('utilities/helper/axiosRequestHelper');
+const {
+  createBattle, connectBattle, updateStatsBattle, getBattlesByState,
+} = require('utilities/helper/axiosRequestHelper');
 
 const wss = new SocketServer({ port: 4000, path: '/start' });
 
@@ -83,7 +85,18 @@ class WebSoket {
         } catch (error) {
           console.error('Error WS parse JSON message', message, error);
         }
-        if (call.method === 'create_battle' && call.params) {
+        if (call.method === 'connect_user' && call.params.playerID) {
+          const { result: { battles: startedBattles }, error } = await getBattlesByState();
+          if (error) console.error(error);
+          const result = _.find(
+            startedBattles, (battle) => _.get(battle, 'playersInfo.firstPlayer.playerID') === call.params.playerID
+                  || _.get(battle, 'playersInfo.secondPlayer.playerID') === call.params.playerID,
+          );
+          if (result) {
+            ws.battle = result._id;
+            sendMessagesBattle({ battle: result, game: { battle: result } });
+          }
+        } else if (call.method === 'create_battle' && call.params) {
           const { result, error } = await createBattle({ call, ws });
           if (error) console.error(error);
           if (result.battle) sendStateBattle({ method: 'create_battle', battle: result.battle });

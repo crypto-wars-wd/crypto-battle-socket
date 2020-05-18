@@ -9,7 +9,7 @@ exports.connectBattle = async ({ call }) => {
       playerID: call.params.playerID,
       battleID: call.params.battleID,
     };
-    return axiosRequest(`${apiServer}/api/connect-battle`, body);// add in config or env
+    return axiosRequest({ url: `${apiServer}/api/connect-battle`, params: body, viewRequest: 'post' });
   }
   return { error: 'error params' };
 };
@@ -21,12 +21,11 @@ exports.createBattle = async ({ call }) => {
       playerID: call.params.playerID,
       healthPoints: call.params.healthPoints,
     };
-    return axiosRequest(`${apiServer}/api/create-battle`, body);// add in config or env
+    return axiosRequest({ url: `${apiServer}/api/create-battle`, params: body, viewRequest: 'post' });
   }
   return { error: 'error params' };
 };
 
-exports.updateStatsBattle = async ({ battle }) => {
-  const body = battle;
-  return axiosRequest(`${apiServer}/api/stats-battle`, body);// add in config or env
-};
+exports.getBattlesByState = async () => axiosRequest({ url: `${apiServer}/api/show-battles-by-state/select?state=start`, viewRequest: 'get' });
+
+exports.updateStatsBattle = async ({ battle }) => axiosRequest({ url: `${apiServer}/api/stats-battle`, params: battle, viewRequest: 'post' });
