@@ -6,10 +6,10 @@
         "bitfinex": "2~Bitfinex",
         "binance": "2~Binance",
         "P2PB2B": "2~P2PB2B"
-      },
-      "redis": {
-        "widgetsRate": 1
       }
+    },
+    "redis": {
+      "widgetsRate": 1
     }
   },
   "development": {
