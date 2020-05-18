@@ -60,7 +60,7 @@ const startGame = async ({ battle, ws }) => {
     const status = game.getStepStatus();
     if (!_.isEmpty(status)) {
       const { result, error } = await updateStatsBattle({ battle: status, ws });
-      if (error) sendMessagesBattle({ battle, game: result });
+      if (error) console.error(error);
       sendMessagesBattle({ battle, game: result });
       if (status.gameStatus === 'END') {
         sendStateBattle({ method: 'end_battle', battle: result.battle });
