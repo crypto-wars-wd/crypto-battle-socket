@@ -51,7 +51,7 @@ const startGame = async ({ battle, ws }) => {
       (await getActualWidgetsRate(battle.playersInfo.firstPlayer.cryptoName)).price,
       (await getActualWidgetsRate(battle.playersInfo.secondPlayer.cryptoName)).price,
     ],
-    battle,
+    battle: _.cloneDeep(battle),
   });
   await game.start();
 
@@ -63,8 +63,8 @@ const startGame = async ({ battle, ws }) => {
       if (error) sendMessagesBattle({ battle, game: result });
       sendMessagesBattle({ battle, game: result });
       if (status.gameStatus === 'END') {
+        sendStateBattle({ method: 'end_battle', battle: result.battle });
         clearInterval(gameProcess);
-        return console.log('Game end');
       }
     }
   }, 1000);
@@ -95,7 +95,7 @@ class WebSoket {
           if (result.battle) sendStateBattle({ method: 'start_battle', battle: result.battle });
 
           ws.battle = result.battle._id;
-          startGame({ battle: result.battle, ws });
+          await startGame({ battle: result.battle, ws });
           return console.log(`Battle ${result.battle._id} started`);
         } else {
           sendSomethingWrong({ call, ws, error: 'Something is wrong' });
