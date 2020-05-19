@@ -8,15 +8,15 @@ class GameProcess {
   }) {
     this.battle = battle;
     this.firstWarrior = new Warrior({
-      widgetName: firstWarrior.cryptoName,
+      cryptoName: firstWarrior.cryptoName,
       widgetCurrentPrice: widgetCurrentPrice[0],
-      healthPoints: battle.playersInfo.healthPoints,
+      healthPoints: firstWarrior.healthPoints || battle.playersInfo.healthPoints,
       playerID: firstWarrior.playerID,
     });
     this.secondWarrior = new Warrior({
-      widgetName: secondWarrior.cryptoName,
+      cryptoName: secondWarrior.cryptoName,
       widgetCurrentPrice: widgetCurrentPrice[1],
-      healthPoints: battle.playersInfo.healthPoints,
+      healthPoints: secondWarrior.healthPoints || battle.playersInfo.healthPoints,
       playerID: secondWarrior.playerID,
     });
     this.step = new BattleStatus({
@@ -30,10 +30,10 @@ class GameProcess {
   async start() {
     this.startOperation = setInterval(async () => {
       this.firstWarrior.updatePrice({
-        widgetCurrentPrice: (await getActualWidgetsRate(this.firstWarrior.warrior.widgetName)).price,
+        widgetCurrentPrice: (await getActualWidgetsRate(this.firstWarrior.warrior.cryptoName)).price,
       });
       this.secondWarrior.updatePrice({
-        widgetCurrentPrice: (await getActualWidgetsRate(this.secondWarrior.warrior.widgetName)).price,
+        widgetCurrentPrice: (await getActualWidgetsRate(this.secondWarrior.warrior.cryptoName)).price,
       });
     }, 1000);
   }
@@ -70,11 +70,11 @@ class GameProcess {
 const winnerCheck = ({ winner, looser }) => ({
   winner: {
     playerID: winner.playerID,
-    cryptoName: winner.widgetName,
+    cryptoName: winner.cryptoName,
   },
   looser: {
     playerID: looser.playerID,
-    cryptoName: looser.widgetName,
+    cryptoName: looser.cryptoName,
   },
 });
 

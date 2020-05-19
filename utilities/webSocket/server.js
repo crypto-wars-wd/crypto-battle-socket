@@ -44,11 +44,12 @@ const sendMessagesBattle = ({ battle, game }) => {
   });
 };
 
-
-const startGame = async ({ battle, ws }) => {
+const startGame = async ({
+  battle, firstPlayer, secondPlayer,
+}) => {
   const game = new GameProcess({
-    firstWarrior: battle.playersInfo.firstPlayer,
-    secondWarrior: battle.playersInfo.secondPlayer,
+    firstWarrior: firstPlayer,
+    secondWarrior: secondPlayer,
     widgetCurrentPrice: [
       (await getActualWidgetsRate(battle.playersInfo.firstPlayer.cryptoName)).price,
       (await getActualWidgetsRate(battle.playersInfo.secondPlayer.cryptoName)).price,
@@ -61,7 +62,7 @@ const startGame = async ({ battle, ws }) => {
     await game.nextStep();
     const status = game.getStepStatus();
     if (!_.isEmpty(status)) {
-      const { result, error } = await updateStatsBattle({ battle: status, ws });
+      const { result, error } = await updateStatsBattle({ battle: status });
       if (error) console.error(error);
       sendMessagesBattle({ battle, game: result });
       if (status.gameStatus === 'END') {
@@ -108,7 +109,11 @@ class WebSoket {
           if (result.battle) sendStateBattle({ method: 'start_battle', battle: result.battle });
 
           ws.battle = result.battle._id;
-          await startGame({ battle: result.battle, ws });
+          await startGame({
+            battle: result.battle,
+            firstPlayer: result.battle.playersInfo.firstPlayer,
+            secondPlayer: result.battle.playersInfo.secondPlayer,
+          });
           return console.log(`Battle ${result.battle._id} started`);
         } else {
           sendSomethingWrong({ call, ws, error: 'Something is wrong' });
@@ -118,6 +123,15 @@ class WebSoket {
   }
 }
 
-const wssConnection = new WebSoket();
+exports.checkStartBattles = async () => {
+  const { result: { battles: startedBattles }, error } = await getBattlesByState();
+  if (error) console.error(error);
+  if (Array.isArray(startedBattles) && startedBattles.length !== 0) {
+    startedBattles.forEach((battle) => {
+      const { playersStats } = battle.steps[battle.steps.length - 1];
+      startGame({ firstPlayer: playersStats[0], secondPlayer: playersStats[1], battle });
+    });
+  }
+};
 
-module.exports = wssConnection;
+exports.wssConnection = new WebSoket();

@@ -12,18 +12,18 @@ class BattleStatus {
     this.messages = '';
     if (this.firstWarrior.status === 'UP') {
       this.secondWarrior.healthPoints--;
-      this.messages += messages.hit(this.firstWarrior.widgetName, this.secondWarrior.widgetName);
+      this.messages += messages.hit(this.firstWarrior.cryptoName, this.secondWarrior.cryptoName);
     } else if (this.firstWarrior.status === 'DOWN') {
       this.firstWarrior.healthPoints--;
-      this.messages += messages.getHit(this.firstWarrior.widgetName);
+      this.messages += messages.getHit(this.firstWarrior.cryptoName);
     }
 
     if (this.secondWarrior.status === 'UP') {
       this.firstWarrior.healthPoints--;
-      this.messages += messages.hit(this.secondWarrior.widgetName, this.firstWarrior.widgetName);
+      this.messages += messages.hit(this.secondWarrior.cryptoName, this.firstWarrior.widgetName);
     } else if (this.secondWarrior.status === 'DOWN') {
       this.secondWarrior.healthPoints--;
-      this.messages += messages.getHit(this.secondWarrior.widgetName);
+      this.messages += messages.getHit(this.secondWarrior.cryptoName);
     }
   }
 

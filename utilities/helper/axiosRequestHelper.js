@@ -1,6 +1,6 @@
 const { axiosRequest } = require('utilities/request');
 
-const apiServer = process.env.API_SERVER || 'http://localhost:3001';
+const apiServer = process.env.API_SERV;
 
 exports.connectBattle = async ({ call }) => axiosRequest({ url: `${apiServer}/api/connect-battle`, params: call.params, viewRequest: 'post' });
 

@@ -1,9 +1,8 @@
 class Warrior {
-  constructor({
-    widgetName, widgetCurrentPrice, playerID, healthPoints,
+  constructor({cryptoName, widgetCurrentPrice, playerID, healthPoints,
   }) {
     this.warrior = {
-      widgetName, status: 'UNCHANGED', price: widgetCurrentPrice, playerID, healthPoints,
+      cryptoName, status: 'UNCHANGED', price: widgetCurrentPrice, playerID, healthPoints,
     };
   }
 

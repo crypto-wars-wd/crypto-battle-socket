@@ -63,7 +63,7 @@ class Widgets {
   async updateInDataBase(msg) {
     const data = JSON.stringify({
       price: msg.PRICE,
-      widgetName: msg.FROMSYMBOL,
+      cryptoName: msg.FROMSYMBOL,
       fullName: msg.FROMSYMBOL + msg.TOSYMBOL,
       lastUpdate: msg.LASTUPDATE,
     });
@@ -71,6 +71,6 @@ class Widgets {
   }
 }
 
-const widgetsCryptocompare = new Widgets(config.widgets.socketConnection, process.env.WIDGETS_KEY || 'ff0dd30d773722079f90f4686f91b0d5c82061f20f17e6817f6db6a7a1e071e3');
+const widgetsCryptocompare = new Widgets(config.widgets.socketConnection, process.env.WIDGETS_KEY);
 
 module.exports = widgetsCryptocompare;
