@@ -1,6 +1,6 @@
 const { axiosRequest } = require('utilities/request');
 
-const apiServer = process.env.API_SERVER;
+const apiServer = process.env.API_SERVER || 'http://localhost:3001';
 
 exports.connectBattle = async ({ call }) => {
   if (call.params.cryptoName && call.params.playerID && call.params.battleID) {
