@@ -8,4 +8,4 @@ exports.createBattle = async ({ call }) => axiosRequest({ url: `${apiServer}/api
 
 exports.getBattlesByState = async () => axiosRequest({ url: `${apiServer}/api/show-battles-by-state/select?state=start`, viewRequest: 'get' });
 
-exports.updateStatsBattle = async ({ battle }) => axiosRequest({ url: `${apiServer}/api/stats-battle`, params: battle, viewRequest: 'post' });
+exports.updateStatsBattle = async ({ battle }) => axiosRequest({ url: `${apiServer}/api/save-stats-battle`, params: battle, viewRequest: 'post' });
