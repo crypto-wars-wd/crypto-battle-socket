@@ -47,6 +47,7 @@ const sendMessagesBattle = ({ battle, game }) => {
 const startGame = async ({
   battle, firstPlayer, secondPlayer,
 }) => {
+  console.log(`Start game ${battle._id}`);
   const game = new GameProcess({
     firstWarrior: firstPlayer,
     secondWarrior: secondPlayer,
@@ -114,7 +115,6 @@ class WebSoket {
             firstPlayer: result.battle.playersInfo.firstPlayer,
             secondPlayer: result.battle.playersInfo.secondPlayer,
           });
-          return console.log(`Battle ${result.battle._id} started`);
         } else {
           sendSomethingWrong({ call, ws, error: 'Something is wrong' });
         }
@@ -128,8 +128,12 @@ exports.checkStartBattles = async () => {
   if (error) console.error(error);
   if (Array.isArray(startedBattles) && startedBattles.length !== 0) {
     startedBattles.forEach((battle) => {
-      const { playersStats } = battle.steps[battle.steps.length - 1];
-      startGame({ firstPlayer: playersStats[0], secondPlayer: playersStats[1], battle });
+      if (battle.steps.length > 0) {
+        const { playersStats } = battle.steps[battle.steps.length - 1];
+        startGame({ firstPlayer: playersStats[0], secondPlayer: playersStats[1], battle });
+      } else {
+        startGame({ firstPlayer: battle.playersInfo.firstPlayer, secondPlayer: battle.playersInfo.secondPlayer, battle });
+      }
     });
   }
 };
