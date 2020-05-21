@@ -1,1 +1,1 @@
-const startGame = require('utilities/helper/startGame');
+const startGame = require('utilities/helpers/startGame');

@@ -1,10 +1,10 @@
 const SocketServer = require('ws').Server;
 const _ = require('lodash');
-const GameProcess = require('utilities/helper/gameProcess');
+const GameProcess = require('utilities/helpers/gameProcess');
 const { getActualWidgetsRate } = require('utilities/redis/redisHelper');
 const {
   createBattle, connectBattle, updateStatsBattle, getBattlesByState,
-} = require('utilities/helper/axiosRequestHelper');
+} = require('utilities/helpers/axiosRequestHelper');
 
 const wss = new SocketServer({ port: 4000, path: '/start' });
 
