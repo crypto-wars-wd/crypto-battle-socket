@@ -78,11 +78,7 @@ const startGame = async ({
   const gameProcess = setInterval(async () => {
     await game.nextStep();
     const status = game.getStepStatus();
-
     if (!_.isEmpty(status)) {
-      if (status.gameStatus === 'END') {
-        console.log('');
-      }
       await messages.push(status);
       if (status.gameStatus === 'END') {
         clearInterval(gameProcess);
