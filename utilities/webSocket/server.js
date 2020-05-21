@@ -125,8 +125,8 @@ class WebSocket {
             ws.battle = _.get(result, 'battle._id');
             await startGame({
               battle: result.battle,
-              firstPlayer: _.get(result.battle, 'playersInfo.firstPlayer'),
-              secondPlayer: _.get(result.battle, 'playersInfo.secondPlayer'),
+              firstPlayer: _.get(result, 'battle.playersInfo.firstPlayer'),
+              secondPlayer: _.get(result, 'battle.playersInfo.secondPlayer'),
             });
           }
         } else {
