@@ -1,6 +1,8 @@
-exports.getHit = (victim) => `Игрок ${victim} ${getHitMessages[random(0, getHitMessages.length)]} `;
+const _ = require('lodash');
 
-exports.hit = (kicker, victim) => `Игрок ${kicker} ${hitMessages[random(0, hitMessages.length)]} ${victim} `;
+exports.getHit = (victim) => `Игрок ${victim} ${_.sample(getHitMessages)} `;
+
+exports.hit = (kicker, victim) => `Игрок ${kicker} ${_.sample(hitMessages)} ${victim} `;
 
 
 const getHitMessages = [
@@ -13,5 +15,3 @@ const hitMessages = [
   'дал пяткой в глаз',
   'унизил',
 ];
-
-const random = (min, max) => Math.floor(min + Math.random() * (max - min));

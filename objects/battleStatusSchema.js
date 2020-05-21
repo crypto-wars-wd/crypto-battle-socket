@@ -9,31 +9,28 @@ class BattleStatus {
   }
 
   nextStep() {
-    this.messages = '';
-    if (this.firstWarrior.status === 'UP') {
-      this.secondWarrior.healthPoints--;
-      this.messages += messages.hit(this.firstWarrior.cryptoName, this.secondWarrior.cryptoName);
-    } else if (this.firstWarrior.status === 'DOWN') {
-      this.firstWarrior.healthPoints--;
-      this.messages += messages.getHit(this.firstWarrior.cryptoName);
-    }
-
-    if (this.secondWarrior.status === 'UP') {
-      this.firstWarrior.healthPoints--;
-      this.messages += messages.hit(this.secondWarrior.cryptoName, this.firstWarrior.widgetName);
-    } else if (this.secondWarrior.status === 'DOWN') {
-      this.secondWarrior.healthPoints--;
-      this.messages += messages.getHit(this.secondWarrior.cryptoName);
-    }
+    this.messages = [];
+    statusChecker({ currentPlayer: this.firstWarrior, minorPlayer: this.secondWarrior, currentMessages: this.messages });
+    statusChecker({ currentPlayer: this.secondWarrior, minorPlayer: this.firstWarrior, currentMessages: this.messages });
   }
 
   getSteps() {
     if (this.firstWarrior.healthPoints === 0 || this.secondWarrior.healthPoints === 0) this.gameStatus = 'CLOSED';
     return {
       playersStats: [this.firstWarrior, this.secondWarrior],
-      messages: this.messages,
+      messages: this.messages.toString(),
     };
   }
 }
+
+const statusChecker = ({ currentPlayer, minorPlayer, currentMessages }) => {
+  if (currentPlayer.status === 'UP') {
+    minorPlayer.healthPoints--;
+    currentMessages.push(messages.hit(currentPlayer.cryptoName, minorPlayer.cryptoName));
+  } else if (currentPlayer.status === 'DOWN') {
+    currentPlayer.healthPoints--;
+    currentMessages.push(messages.getHit(currentPlayer.cryptoName));
+  }
+};
 
 module.exports = BattleStatus;

@@ -32,7 +32,6 @@ const sendStateBattle = ({ method, battle }) => {
 };
 
 const sendMessagesBattle = ({ battle, game }) => {
-  console.log('step');
   wss.clients.forEach((player) => {
     if (player.battle === battle._id) {
       player.send(
@@ -74,7 +73,7 @@ const startGame = async ({
   }, 1000);
 };
 
-class WebSoket {
+class WebSocket {
   constructor() {
     this.wss = wss;
     this.wss.on('connection', async (ws) => {
@@ -88,33 +87,34 @@ class WebSoket {
           console.error('Error WS parse JSON message', message, error);
         }
         if (call.method === 'connect_user' && call.params.playerID) {
-          const { result: { battles: startedBattles }, error } = await getBattlesByState();
+          const { result: { battles: startedBattle }, error } = await getBattlesByState(call.params.playerID);
           if (error) console.error(error);
-          const result = _.find(
-            startedBattles, (battle) => _.get(battle, 'playersInfo.firstPlayer.playerID') === call.params.playerID
-                  || _.get(battle, 'playersInfo.secondPlayer.playerID') === call.params.playerID,
-          );
-          if (result) {
-            ws.battle = result._id;
-            sendMessagesBattle({ battle: result, game: { battle: result } });
+
+          // player has only one active game
+          if (startedBattle[0]) {
+            ws.battle = startedBattle[0]._id;
+            sendMessagesBattle({ battle: startedBattle[0], game: { battle: startedBattle[0] } });
           }
         } else if (call.method === 'create_battle' && call.params) {
           const { result, error } = await createBattle({ call, ws });
           if (error) console.error(error);
-          if (result.battle) sendStateBattle({ method: 'create_battle', battle: result.battle });
-
-          ws.battle = result.battle._id;
+          if (result && result.battle) {
+            sendStateBattle({ method: 'create_battle', battle: result.battle });
+            ws.battle = _.get(result, 'battle._id');
+          }
         } else if (call.method === 'connect_battle' && call.params) {
           const { result, error } = await connectBattle({ call, ws });
           if (error) console.error(error);
-          if (result.battle) sendStateBattle({ method: 'start_battle', battle: result.battle });
+          if (result && result.battle) {
+            sendStateBattle({ method: 'start_battle', battle: result.battle });
 
-          ws.battle = result.battle._id;
-          await startGame({
-            battle: result.battle,
-            firstPlayer: result.battle.playersInfo.firstPlayer,
-            secondPlayer: result.battle.playersInfo.secondPlayer,
-          });
+            ws.battle = _.get(result, 'battle._id');
+            await startGame({
+              battle: result.battle,
+              firstPlayer: _.get(result.battle, 'playersInfo.firstPlayer'),
+              secondPlayer: _.get(result.battle, 'playersInfo.secondPlayer'),
+            });
+          }
         } else {
           sendSomethingWrong({ call, ws, error: 'Something is wrong' });
         }
@@ -124,9 +124,10 @@ class WebSoket {
 }
 
 exports.checkStartBattles = async () => {
-  const { result: { battles: startedBattles }, error } = await getBattlesByState();
+  const { result, error } = await getBattlesByState();
   if (error) console.error(error);
-  if (Array.isArray(startedBattles) && startedBattles.length !== 0) {
+  if (result.battles && Array.isArray(result.battles) && result.battles.length !== 0) {
+    const startedBattles = result.battles;
     startedBattles.forEach((battle) => {
       if (battle.steps.length > 0) {
         const { playersStats } = battle.steps[battle.steps.length - 1];
@@ -138,4 +139,4 @@ exports.checkStartBattles = async () => {
   }
 };
 
-exports.wssConnection = new WebSoket();
+exports.wssConnection = new WebSocket();
