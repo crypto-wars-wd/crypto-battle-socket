@@ -1,6 +1,6 @@
 const { BattleStatus, Warrior } = require('objects');
 const _ = require('lodash');
-const { getActualWidgetsRate } = require('utilities/redis/redisHelper');
+const { getActualWidgetsRate } = require('utilities/redis/redisGetter');
 
 class GameProcess {
   constructor({
@@ -35,7 +35,7 @@ class GameProcess {
       this.secondWarrior.updatePrice({
         widgetCurrentPrice: (await getActualWidgetsRate(this.secondWarrior.warrior.cryptoName)).price,
       });
-    }, 1000);
+    }, 900);
   }
 
   nextStep() {

@@ -1,12 +1,29 @@
 const SocketServer = require('ws').Server;
 const _ = require('lodash');
 const GameProcess = require('utilities/helpers/gameProcess');
-const { getActualWidgetsRate } = require('utilities/redis/redisHelper');
+const { getActualWidgetsRate } = require('utilities/redis/redisGetter');
 const {
   createBattle, connectBattle, updateStatsBattle, getBattlesByState,
 } = require('utilities/helpers/axiosRequestHelper');
 
+let messages = [];
+
 const wss = new SocketServer({ port: 4000, path: '/start' });
+
+const saveStateBattle = () => {
+  setInterval(async () => {
+    if (!_.isEmpty(messages)) {
+      const { result, error } = await updateStatsBattle({ battles: messages });
+      if (error) console.error(error);
+      if (result && result.battles) {
+        result.battles.forEach((battle) => {
+          sendMessagesBattle({ battle });
+        });
+      }
+    }
+    messages = [];
+  }, 1000);
+};
 
 const sendSomethingWrong = ({ ws, call, error }) => {
   ws.send(
@@ -31,12 +48,12 @@ const sendStateBattle = ({ method, battle }) => {
   });
 };
 
-const sendMessagesBattle = ({ battle, game }) => {
+const sendMessagesBattle = ({ battle }) => {
   wss.clients.forEach((player) => {
     if (player.battle === battle._id) {
       player.send(
         JSON.stringify({
-          messages: game,
+          messages: battle,
         }),
       );
     }
@@ -61,16 +78,17 @@ const startGame = async ({
   const gameProcess = setInterval(async () => {
     await game.nextStep();
     const status = game.getStepStatus();
+
     if (!_.isEmpty(status)) {
-      const { result, error } = await updateStatsBattle({ battle: status });
-      if (error) console.error(error);
-      sendMessagesBattle({ battle, game: result });
       if (status.gameStatus === 'END') {
-        sendStateBattle({ method: 'end_battle', battle: result.battle });
+        console.log('');
+      }
+      await messages.push(status);
+      if (status.gameStatus === 'END') {
         clearInterval(gameProcess);
       }
     }
-  }, 1000);
+  }, 900);
 };
 
 class WebSocket {
@@ -93,7 +111,7 @@ class WebSocket {
           // player has only one active game
           if (startedBattle[0]) {
             ws.battle = startedBattle[0]._id;
-            sendMessagesBattle({ battle: startedBattle[0], game: { battle: startedBattle[0] } });
+            sendMessagesBattle({ battle: startedBattle[0] });
           }
         } else if (call.method === 'create_battle' && call.params) {
           const { result, error } = await createBattle({ call, ws });
@@ -124,9 +142,10 @@ class WebSocket {
 }
 
 exports.checkStartBattles = async () => {
+  saveStateBattle();
   const { result, error } = await getBattlesByState();
   if (error) console.error(error);
-  if (result.battles && Array.isArray(result.battles) && result.battles.length !== 0) {
+  if (result && result.battles && Array.isArray(result.battles) && result.battles.length !== 0) {
     const startedBattles = result.battles;
     startedBattles.forEach((battle) => {
       if (battle.steps.length > 0) {

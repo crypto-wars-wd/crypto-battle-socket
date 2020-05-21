@@ -1,7 +1,7 @@
 const config = require('config');
 const WebSocket = require('ws');
 const moment = require('moment');
-const { addActualWidgetRate } = require('utilities/redis/redisHelper');
+const { addActualWidgetRate } = require('utilities/redis/redisSetter');
 const { gameWidgets } = require('utilities/constants');
 
 class Widgets {
@@ -71,6 +71,6 @@ class Widgets {
   }
 }
 
-const widgetsCryptocompare = new Widgets(config.widgets.socketConnection, process.env.WIDGETS_KEY || 'ff0dd30d773722079f90f4686f91b0d5c82061f20f17e6817f6db6a7a1e071e3');
+const widgetsCryptocompare = new Widgets(config.widgets.socketConnection, process.env.WIDGETS_KEY);
 
 module.exports = widgetsCryptocompare;
