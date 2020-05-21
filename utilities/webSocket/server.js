@@ -16,7 +16,8 @@ const saveStateBattle = () => {
       const { result, error } = await updateStatsBattle({ battles: messages });
       if (error) console.error(error);
       if (result && result.battles) {
-        result.battles.forEach((battle) => {
+        const updatedStatsBattles = result.battles;
+        updatedStatsBattles.forEach((battle) => {
           sendMessagesBattle({ battle });
         });
       }
