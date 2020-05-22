@@ -10,19 +10,19 @@ class GameProcess {
     this.firstWarrior = new Warrior({
       cryptoName: firstWarrior.cryptoName,
       widgetCurrentPrice: widgetCurrentPrice[0],
-      healthPoints: firstWarrior.healthPoints || battle.playersInfo.healthPoints,
+      healthPoints: firstWarrior.healthPoints || battle.healthPoints,
       playerID: firstWarrior.playerID,
     });
     this.secondWarrior = new Warrior({
       cryptoName: secondWarrior.cryptoName,
       widgetCurrentPrice: widgetCurrentPrice[1],
-      healthPoints: secondWarrior.healthPoints || battle.playersInfo.healthPoints,
+      healthPoints: secondWarrior.healthPoints || battle.healthPoints,
       playerID: secondWarrior.playerID,
     });
     this.step = new BattleStatus({
       firstWarrior: this.firstWarrior.getStatus(),
       secondWarrior: this.secondWarrior.getStatus(),
-      healthPoints: battle.playersInfo.healthPoints,
+      healthPoints: battle.healthPoints,
       playerID: secondWarrior.playerID,
     });
   }

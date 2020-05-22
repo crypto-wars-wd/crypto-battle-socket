@@ -18,7 +18,8 @@ const saveStateBattle = () => {
       if (result && result.battles) {
         const updatedStatsBattles = result.battles;
         updatedStatsBattles.forEach((battle) => {
-          sendMessagesBattle({ battle });
+          if (battle.gameStatus === 'END') sendStateBattle({ method: 'end_battle', battle });
+          else sendMessagesBattle({ battle });
         });
       }
     }
@@ -69,8 +70,8 @@ const startGame = async ({
     firstWarrior: firstPlayer,
     secondWarrior: secondPlayer,
     widgetCurrentPrice: [
-      (await getActualWidgetsRate(battle.playersInfo.firstPlayer.cryptoName)).price,
-      (await getActualWidgetsRate(battle.playersInfo.secondPlayer.cryptoName)).price,
+      (await getActualWidgetsRate(battle.firstPlayer.cryptoName)).price,
+      (await getActualWidgetsRate(battle.secondPlayer.cryptoName)).price,
     ],
     battle: _.cloneDeep(battle),
   });
@@ -126,8 +127,8 @@ class WebSocket {
             ws.battle = _.get(result, 'battle._id');
             await startGame({
               battle: result.battle,
-              firstPlayer: _.get(result, 'battle.playersInfo.firstPlayer'),
-              secondPlayer: _.get(result, 'battle.playersInfo.secondPlayer'),
+              firstPlayer: _.get(result, 'battle.firstPlayer'),
+              secondPlayer: _.get(result, 'battle.secondPlayer'),
             });
           }
         } else {
@@ -142,14 +143,14 @@ exports.checkStartBattles = async () => {
   saveStateBattle();
   const { result, error } = await getBattlesByState();
   if (error) console.error(error);
-  if (result && result.battles && Array.isArray(result.battles) && result.battles.length !== 0) {
+  if (result && result.battles && _.isArray(result.battles) && _.isEmpty(result.battles)) {
     const startedBattles = result.battles;
     startedBattles.forEach((battle) => {
       if (battle.steps.length > 0) {
         const { playersStats } = battle.steps[battle.steps.length - 1];
         startGame({ firstPlayer: playersStats[0], secondPlayer: playersStats[1], battle });
       } else {
-        startGame({ firstPlayer: battle.playersInfo.firstPlayer, secondPlayer: battle.playersInfo.secondPlayer, battle });
+        startGame({ firstPlayer: battle.firstPlayer, secondPlayer: battle.secondPlayer, battle });
       }
     });
   }
