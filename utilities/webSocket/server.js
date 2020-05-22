@@ -16,6 +16,7 @@ const saveStateBattle = () => {
       const { result, error } = await updateStatsBattle({ battles: messages });
       if (error) console.error(error);
       if (result && result.battles) {
+        messages = [];
         const updatedStatsBattles = result.battles;
         updatedStatsBattles.forEach((battle) => {
           if (battle.gameStatus === 'END') sendStateBattle({ method: 'end_battle', battle });
@@ -23,7 +24,6 @@ const saveStateBattle = () => {
         });
       }
     }
-    messages = [];
   }, 1000);
 };
 
@@ -143,7 +143,7 @@ exports.checkStartBattles = async () => {
   saveStateBattle();
   const { result, error } = await getBattlesByState();
   if (error) console.error(error);
-  if (result && result.battles && _.isArray(result.battles) && _.isEmpty(result.battles)) {
+  if (result && result.battles && _.isArray(result.battles) && !_.isEmpty(result.battles)) {
     const startedBattles = result.battles;
     startedBattles.forEach((battle) => {
       if (battle.steps.length > 0) {
