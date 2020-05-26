@@ -117,7 +117,6 @@ class WebSocket {
           if (error) console.error(error);
           if (result && result.battle) {
             sendStateBattle({ method: 'create_battle', battle: result.battle });
-            // ws.battle = _.get(result, 'battle._id');
           }
         } else if (call.method === 'connect_battle' && call.params) {
           const { result, error } = await connectBattle({ call, ws });
@@ -128,11 +127,6 @@ class WebSocket {
             const value = `${result.battle.firstPlayer.cryptoName}/${result.battle.healthPoints}:${result.battle.secondPlayer.cryptoName}/${result.battle.healthPoints}`;
             ws.battle = _.get(result, 'battle._id');
             await addActualBattle({path, value});
-            // await startGame({
-            //   battle: result.battle,
-            //   firstPlayer: _.get(result, 'battle.firstPlayer'),
-            //   secondPlayer: _.get(result, 'battle.secondPlayer'),
-            // });
           }
         } else {
           sendSomethingWrong({ call, ws, error: 'Something is wrong' });
@@ -140,9 +134,9 @@ class WebSocket {
       });
     });
   }
-   sendToEveryone(battles) {
+  sendToEveryone({message, battles}) {
     wss.clients.forEach((user) => {
-      user.send(JSON.stringify({battles}));
+      user.send(JSON.stringify({message, battles}));
     });
   }
 }

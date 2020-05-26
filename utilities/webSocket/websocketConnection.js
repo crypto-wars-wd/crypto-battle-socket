@@ -85,7 +85,7 @@ class Widgets {
     await addActualWidgetRate({ widget: msg.FROMSYMBOL, data: JSON.stringify(data) });
 
     const arrayToFront = []
-    arrayToFront.push(data.message)
+   
     const activeBattles = await getActiveBattleByCryptoName(msg.FROMSYMBOL)
 
     for (const element of activeBattles) {
@@ -128,7 +128,7 @@ class Widgets {
           await addActualBattle({path, value: `${arr[0].split('/')[0]}/${myHealthPoints}:${arr[1]}`})
         }
       }
-      wssConnection.sendToEveryone(arrayToFront)
+      wssConnection.sendToEveryone({message: data.message, battles: arrayToFront})
     }
   }
 }
