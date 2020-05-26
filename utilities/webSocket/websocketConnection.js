@@ -83,52 +83,78 @@ class Widgets {
     }
 
     await addActualWidgetRate({ widget: msg.FROMSYMBOL, data: JSON.stringify(data) });
+    await this.handleActiveBattles(msg, data);
+  }
 
+  async handleActiveBattles(msg, data) {
+    const activeBattles = await getActiveBattleByCryptoName(msg.FROMSYMBOL);
     const arrayToFront = [];
 
-    const activeBattles = await getActiveBattleByCryptoName(msg.FROMSYMBOL);
-
     for (const element of activeBattles) {
-      let myHealthPoints, enemyHealthPoints;
       const splitElement = element.split(':');
       const path = `${splitElement[1]}:${splitElement[2]}`;
+      const battleID = splitElement[2];
       const active = await getOneBattle(element);
       const arr = active.split(':');
       const match = arr[0].match(new RegExp(`${msg.FROMSYMBOL}`));
       const firstCryptoName = arr[0].split('/')[0];
       const secondCryptoName = arr[1].split('/')[0];
+      let firstCryptoHP = parseInt(arr[0].split('/')[1]);
+      let secondCryptoHP = parseInt(arr[1].split('/')[1]);
 
-      if (match === null) {
-        myHealthPoints = parseInt(arr[1].split('/')[1]);
-        enemyHealthPoints = parseInt(arr[0].split('/')[1]);
-        if (data.status === 'UP') {
-          enemyHealthPoints--;
-          arrayToFront.push({ id: splitElement[2], healthPoints: { [`${firstCryptoName}`]: `${enemyHealthPoints}`, [`${secondCryptoName}`]: `${myHealthPoints}` } });
-          if (enemyHealthPoints <= 0) return redisDel(element);
-          await addActualBattle({ path, value: `${arr[0].split('/')[0]}/${enemyHealthPoints}:${arr[1]}` });
-        } else if (data.status === 'DOWN') {
-          myHealthPoints--;
-          arrayToFront.push({ id: splitElement[2], healthPoints: { [`${firstCryptoName}`]: `${enemyHealthPoints}`, [`${secondCryptoName}`]: `${myHealthPoints}` } });
-          if (myHealthPoints <= 0) return redisDel(element);
-          await addActualBattle({ path, value: `${arr[0]}:${arr[1].split('/')[0]}/${myHealthPoints}` });
-        }
-      } else {
-        myHealthPoints = parseInt(arr[0].split('/')[1]);
-        enemyHealthPoints = parseInt(arr[1].split('/')[1]);
-        if (data.status === 'UP') {
-          enemyHealthPoints--;
-          arrayToFront.push({ id: splitElement[2], healthPoints: { [`${firstCryptoName}`]: `${myHealthPoints}`, [`${secondCryptoName}`]: `${enemyHealthPoints}` } });
-          if (enemyHealthPoints <= 0) return redisDel(element);
-          await addActualBattle({ path, value: `${arr[0]}:${arr[1].split('/')[0]}/${enemyHealthPoints}` });
-        } else if (data.status === 'DOWN') {
-          myHealthPoints--;
-          arrayToFront.push({ id: splitElement[2], healthPoints: { [`${firstCryptoName}`]: `${myHealthPoints}`, [`${secondCryptoName}`]: `${enemyHealthPoints}` } });
-          if (myHealthPoints <= 0) return redisDel(element);
-          await addActualBattle({ path, value: `${arr[0].split('/')[0]}/${myHealthPoints}:${arr[1]}` });
-        }
+      if (match === null && data.status === 'UP') {
+        firstCryptoHP--;
+        const result = await this.handleSpecificBattle(
+          arrayToFront, firstCryptoName, firstCryptoHP,
+          secondCryptoName, secondCryptoHP, path, battleID, element,
+        );
+        if (result === 'endBattle') return;
       }
+      if (match === null && data.status === 'DOWN') {
+        secondCryptoHP--;
+        const result = await this.handleSpecificBattle(
+          arrayToFront, firstCryptoName, firstCryptoHP,
+          secondCryptoName, secondCryptoHP, path, battleID, element,
+        );
+        if (result === 'endBattle') return;
+      }
+      if (match !== null && data.status === 'UP') {
+        secondCryptoHP--;
+        const result = await this.handleSpecificBattle(
+          arrayToFront, firstCryptoName, firstCryptoHP,
+          secondCryptoName, secondCryptoHP, path, battleID, element,
+        );
+        if (result === 'endBattle') return;
+      }
+      if (match !== null && data.status === 'DOWN') {
+        firstCryptoHP--;
+        const result = await this.handleSpecificBattle(
+          arrayToFront, firstCryptoName, firstCryptoHP,
+          secondCryptoName, secondCryptoHP, path, battleID, element,
+        );
+        if (result === 'endBattle') return;
+      }
+    }
+    if (arrayToFront && arrayToFront.length) {
       wssConnection.sendToEveryone({ message: data.message, battles: arrayToFront });
     }
+  }
+
+  async handleSpecificBattle(
+    arrayToFront, firstCryptoName, firstCryptoHP,
+    secondCryptoName, secondCryptoHP, path, battleID, element,
+  ) {
+    arrayToFront.push({
+      id: battleID,
+      healthPoints: { [`${firstCryptoName}`]: `${firstCryptoHP}`, [`${secondCryptoName}`]: `${secondCryptoHP}` },
+    });
+
+    if (firstCryptoHP <= 0 || secondCryptoHP <= 0) {
+      await redisDel(element);
+      wssConnection.battleEnd({ battle: { id: battleID, healthPoints: { [`${firstCryptoName}`]: `${firstCryptoHP}`, [`${secondCryptoName}`]: `${secondCryptoHP}` } } });
+      return 'endBattle';
+    }
+    await addActualBattle({ path, value: `${firstCryptoName}/${firstCryptoHP}:${secondCryptoName}/${secondCryptoHP}` });
   }
 }
 
