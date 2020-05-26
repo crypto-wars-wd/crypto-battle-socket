@@ -1,1 +1,5 @@
-const startGame = require('utilities/helpers/startGame');
+const widgetsQuotes = require('utilities/webSocket/websocketConnection');
+
+module.exports = (async () => {
+  await widgetsQuotes.createWebSocketConnection();
+})();
