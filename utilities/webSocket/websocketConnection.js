@@ -1,7 +1,7 @@
 const config = require('config');
 const WebSocket = require('ws');
 const moment = require('moment');
-const { addActualWidgetRate, addActualBattle } = require('utilities/redis/redisSetter');
+const { addActualWidgetRate, addActualBattle, redisDel } = require('utilities/redis/redisSetter');
 const { getActualWidgetsRate, getActiveBattleByCryptoName, getOneBattle } = require('utilities/redis/redisGetter');
 const { gameWidgets } = require('utilities/constants');
 
@@ -92,17 +92,17 @@ class Widgets {
       const active = await getOneBattle(element)
       const arr = active.split(':')
       const match = arr[0].match(new RegExp(`${msg.FROMSYMBOL}`))
-      // const match2 = arr[1].match(new RegExp(`${msg.FROMSYMBOL}`))
+
       if(match === null) {
         myHealthPoints = parseInt(arr[1].split('/')[1] )
         enemyHealthPoints = parseInt(arr[0].split('/')[1] )
         if(data.status === 'UP') {
           enemyHealthPoints--;
-          // console.log(enemyHealthPoints)
+          if(enemyHealthPoints <= 0) return await redisDel(element)
           await addActualBattle({path, value: `${arr[0].split('/')[0]}/${enemyHealthPoints}:${arr[1]}`})
         } else if(data.status === 'DOWN') {
           myHealthPoints--;
-          // console.log(myHealthPoints)
+          if(enemyHealthPoints <= 0) return await redisDel(element)
           await addActualBattle({path, value: `${arr[0]}:${arr[1].split('/')[0]}/${myHealthPoints}`})
         }
       } else {
@@ -110,19 +110,14 @@ class Widgets {
         enemyHealthPoints = parseInt(arr[1].split('/')[1] )
         if(data.status === 'UP') {
           enemyHealthPoints--;
-          // console.log(enemyHealthPoints)
+          if(enemyHealthPoints <= 0) return await redisDel(element)
           await addActualBattle({path, value: `${arr[0]}:${arr[1].split('/')[0]}/${enemyHealthPoints}`})
         } else if(data.status === 'DOWN') {
           myHealthPoints--;
+          if(enemyHealthPoints <= 0) return await redisDel(element)
           await addActualBattle({path, value: `${arr[0].split('/')[0]}/${myHealthPoints}:${arr[1]}`})
         }
       }
-
-      // console.log(arr)
-      //
-      // console.log(match1)
-      // console.log(match2)
-      // console.log(healthPoints)
     }
 
     // wssConnection.sendToEveryone(data)
