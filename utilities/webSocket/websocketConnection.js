@@ -84,7 +84,10 @@ class Widgets {
 
     await addActualWidgetRate({ widget: msg.FROMSYMBOL, data: JSON.stringify(data) });
 
+    const arrayToFront = []
+    arrayToFront.push(data.message)
     const activeBattles = await getActiveBattleByCryptoName(msg.FROMSYMBOL)
+
     for (const element of activeBattles) {
       let myHealthPoints, enemyHealthPoints;
       const splitElement = element.split(':')
@@ -92,16 +95,21 @@ class Widgets {
       const active = await getOneBattle(element)
       const arr = active.split(':')
       const match = arr[0].match(new RegExp(`${msg.FROMSYMBOL}`))
+      const firstCryptoName = arr[0].split('/')[0]
+      const secondCryptoName = arr[1].split('/')[0]
 
       if(match === null) {
         myHealthPoints = parseInt(arr[1].split('/')[1] )
         enemyHealthPoints = parseInt(arr[0].split('/')[1] )
         if(data.status === 'UP') {
           enemyHealthPoints--;
+          arrayToFront.push({id: splitElement[2], healthPoints: { [`${firstCryptoName}`]: `${enemyHealthPoints}`, [`${secondCryptoName}`]: `${myHealthPoints}`}})
           if(enemyHealthPoints <= 0) return await redisDel(element)
           await addActualBattle({path, value: `${arr[0].split('/')[0]}/${enemyHealthPoints}:${arr[1]}`})
+
         } else if(data.status === 'DOWN') {
           myHealthPoints--;
+          arrayToFront.push({id: splitElement[2], healthPoints:{ [`${firstCryptoName}`]: `${enemyHealthPoints}`, [`${secondCryptoName}`]: `${myHealthPoints}`} })
           if(enemyHealthPoints <= 0) return await redisDel(element)
           await addActualBattle({path, value: `${arr[0]}:${arr[1].split('/')[0]}/${myHealthPoints}`})
         }
@@ -110,17 +118,18 @@ class Widgets {
         enemyHealthPoints = parseInt(arr[1].split('/')[1] )
         if(data.status === 'UP') {
           enemyHealthPoints--;
+          arrayToFront.push({id: splitElement[2], healthPoints:{ [`${firstCryptoName}`]: `${myHealthPoints}`, [`${secondCryptoName}`]: `${enemyHealthPoints}`}})
           if(enemyHealthPoints <= 0) return await redisDel(element)
           await addActualBattle({path, value: `${arr[0]}:${arr[1].split('/')[0]}/${enemyHealthPoints}`})
         } else if(data.status === 'DOWN') {
           myHealthPoints--;
+          arrayToFront.push({id: splitElement[2], healthPoints:{ [`${firstCryptoName}`]: `${myHealthPoints}`, [`${secondCryptoName}`]: `${enemyHealthPoints}`}})
           if(enemyHealthPoints <= 0) return await redisDel(element)
           await addActualBattle({path, value: `${arr[0].split('/')[0]}/${myHealthPoints}:${arr[1]}`})
         }
       }
+      wssConnection.sendToEveryone(arrayToFront)
     }
-
-    // wssConnection.sendToEveryone(data)
   }
 }
 

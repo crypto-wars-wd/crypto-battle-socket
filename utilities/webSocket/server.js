@@ -140,9 +140,9 @@ class WebSocket {
       });
     });
   }
-   sendToEveryone(data) {
+   sendToEveryone(battles) {
     wss.clients.forEach((user) => {
-      user.send(JSON.stringify({data}));
+      user.send(JSON.stringify({battles}));
     });
   }
 }
