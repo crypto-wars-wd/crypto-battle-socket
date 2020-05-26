@@ -9,4 +9,3 @@ exports.createBattle = async ({ call }) => axiosRequest({ url: `${config.apiUrl}
 exports.getBattlesByState = async (playerID = 'all') => axiosRequest({ url: `${config.apiUrl}api/show-battles-by-state/select?state=start&playerID=${playerID}`, viewRequest: 'get' });
 
 exports.updateStatsBattle = async ({ battles }) => axiosRequest({ url: `${config.apiUrl}api/save-stats-battle`, params: battles, viewRequest: 'post' });
-

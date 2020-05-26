@@ -2,13 +2,14 @@ const SocketServer = require('ws').Server;
 const _ = require('lodash');
 const GameProcess = require('utilities/helpers/gameProcess');
 const { getActualWidgetsRate } = require('utilities/redis/redisGetter');
+const { addActualBattle } = require('utilities/redis/redisSetter');
 const {
   createBattle, connectBattle, updateStatsBattle, getBattlesByState,
 } = require('utilities/helpers/axiosRequestHelper');
 
 let messages = [];
 
-const wss = new SocketServer({ port: 4000, path: '/start' });
+const wss = new SocketServer({ port: 4000, path: '/socket' });
 
 const saveStateBattle = () => {
   setInterval(async () => {
@@ -81,7 +82,7 @@ const startGame = async ({
     await game.nextStep();
     const status = game.getStepStatus();
     if (!_.isEmpty(status)) {
-      await messages.push(status);
+       messages.push(status);
       if (status.gameStatus === 'END') {
         clearInterval(gameProcess);
       }
@@ -103,38 +104,45 @@ class WebSocket {
           console.error('Error WS parse JSON message', message, error);
         }
         if (call.method === 'connect_user' && call.params.playerID) {
-          const { result: { battles: startedBattle }, error } = await getBattlesByState(call.params.playerID);
-          if (error) console.error(error);
-
-          // player has only one active game
-          if (startedBattle[0]) {
-            ws.battle = startedBattle[0]._id;
-            sendMessagesBattle({ battle: startedBattle[0] });
-          }
+          // const { result: { battles: startedBattle }, error } = await getBattlesByState(call.params.playerID);
+          // if (error) console.error(error);
+          //
+          // // player has only one active game
+          // if (startedBattle[0]) {
+          //   ws.battle = startedBattle[0]._id;
+          //   sendMessagesBattle({ battle: startedBattle[0] });
+          // }
         } else if (call.method === 'create_battle' && call.params) {
-          const { result, error } = await createBattle({ call, ws });
+          const { result, error } = await createBattle({ call });
           if (error) console.error(error);
           if (result && result.battle) {
             sendStateBattle({ method: 'create_battle', battle: result.battle });
-            ws.battle = _.get(result, 'battle._id');
+            // ws.battle = _.get(result, 'battle._id');
           }
         } else if (call.method === 'connect_battle' && call.params) {
           const { result, error } = await connectBattle({ call, ws });
           if (error) console.error(error);
           if (result && result.battle) {
             sendStateBattle({ method: 'start_battle', battle: result.battle });
-
+            const path = `${result.battle.firstPlayer.cryptoName}/${result.battle.secondPlayer.cryptoName}:${result.battle._id}`;
+            const value = `${result.battle.firstPlayer.cryptoName}/${result.battle.healthPoints}:${result.battle.secondPlayer.cryptoName}/${result.battle.healthPoints}`;
             ws.battle = _.get(result, 'battle._id');
-            await startGame({
-              battle: result.battle,
-              firstPlayer: _.get(result, 'battle.firstPlayer'),
-              secondPlayer: _.get(result, 'battle.secondPlayer'),
-            });
+            await addActualBattle({path, value});
+            // await startGame({
+            //   battle: result.battle,
+            //   firstPlayer: _.get(result, 'battle.firstPlayer'),
+            //   secondPlayer: _.get(result, 'battle.secondPlayer'),
+            // });
           }
         } else {
           sendSomethingWrong({ call, ws, error: 'Something is wrong' });
         }
       });
+    });
+  }
+   sendToEveryone(data) {
+    wss.clients.forEach((user) => {
+      user.send(JSON.stringify({data}));
     });
   }
 }

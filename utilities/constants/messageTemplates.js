@@ -1,16 +1,17 @@
 const _ = require('lodash');
 
-exports.getHit = (victim) => `Игрок ${victim} ${_.sample(getHitMessages)} `;
+exports.getHit = () => _.sample(getHitMessages);
 
-exports.hit = (kicker, victim) => `Игрок ${kicker} ${_.sample(hitMessages)} ${victim} `;
+exports.hit = () => _.sample(hitMessages);
 
 const getHitMessages = [
   'получил по голове',
-  'офигел от всего происходящего',
+  'пропустил удар',
   'вообще присел',
 ];
 
 const hitMessages = [
   'дал пяткой в глаз',
   'унизил',
+  'бросил ядовитый дротик',
 ];

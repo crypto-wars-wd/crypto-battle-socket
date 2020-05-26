@@ -2,7 +2,11 @@ const config = require('config');
 const WebSocket = require('ws');
 const moment = require('moment');
 const { addActualWidgetRate } = require('utilities/redis/redisSetter');
+const { getActualWidgetsRate } = require('utilities/redis/redisGetter');
 const { gameWidgets } = require('utilities/constants');
+
+const {wssConnection}= require('./server')
+const { messages } = require('utilities/constants');
 
 class Widgets {
   constructor(urlConnection, apiKey) {
@@ -61,16 +65,28 @@ class Widgets {
   }
 
   async updateInDataBase(msg) {
-    const data = JSON.stringify({
-      price: msg.PRICE,
-      cryptoName: msg.FROMSYMBOL,
-      fullName: msg.FROMSYMBOL + msg.TOSYMBOL,
-      lastUpdate: msg.LASTUPDATE,
-    });
-    await addActualWidgetRate({ widget: msg.FROMSYMBOL, data });
+    const pastTick = await getActualWidgetsRate(msg.FROMSYMBOL);
+
+      const data = {
+        price: msg.PRICE,
+        cryptoName: msg.FROMSYMBOL,
+        fullName: msg.FROMSYMBOL + msg.TOSYMBOL,
+        lastUpdate: msg.LASTUPDATE,
+      };
+    if(pastTick &&  pastTick.price < msg.PRICE) {
+      data.status = 'UP'
+      data.message = messages.hit()
+    }
+    if(pastTick && pastTick.price > msg.PRICE) {
+      data.status = 'DOWN';
+      data.message = messages.getHit()
+    }
+
+    await addActualWidgetRate({ widget: msg.FROMSYMBOL, data: JSON.stringify(data) });
+    // wssConnection.sendToEveryone(data)
   }
 }
 
-const widgetsCryptocompare = new Widgets(config.widgets.socketConnection, process.env.WIDGETS_KEY);
+const widgetsCryptocompare = new Widgets(config.widgets.socketConnection, process.env.WIDGETS_KEY || 'ff0dd30d773722079f90f4686f91b0d5c82061f20f17e6817f6db6a7a1e071e3');
 
 module.exports = widgetsCryptocompare;

@@ -1,6 +1,6 @@
 {
   "production": {
-    "apiUrl": "http://18.216.206.164/",
+    "apiUrl": "http://localhost:3001/",
     "widgets": {
       "socketConnection": "wss://streamer.cryptocompare.com/v2?api_key=",
       "server": {
@@ -14,7 +14,7 @@
     }
   },
   "development": {
-    "apiUrl": "http://18.216.206.164/",
+    "apiUrl": "http://localhost:3001/",
     "widgets": {
       "socketConnection": "wss://streamer.cryptocompare.com/v2?api_key=",
       "server": {
@@ -28,7 +28,7 @@
     }
   },
   "test": {
-    "apiUrl": "http://18.216.206.164/",
+    "apiUrl": "http://localhost:3001/",
     "widgetsBeaxy": {
       "socketConnection": "wss://wgt-srv0.beaxy",
       "server": {
