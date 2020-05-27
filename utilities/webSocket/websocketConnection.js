@@ -101,39 +101,41 @@ class Widgets {
       const match = arr[0].match(new RegExp(`${msg.FROMSYMBOL}`));
       const firstCryptoName = arr[0].split('/')[0];
       const secondCryptoName = arr[1].split('/')[0];
+      const firstPlayerID = arr[2];
+      const secondPlayerID = arr[3];
       let firstCryptoHP = parseInt(arr[0].split('/')[1]);
       let secondCryptoHP = parseInt(arr[1].split('/')[1]);
-      let gameStatus;
 
+      console.log(firstPlayerID);
       if (match === null && data.status === 'UP') {
         firstCryptoHP--;
         const result = await this.handleSpecificBattle(
-          arrayToFront, firstCryptoName, firstCryptoHP, arrayBattleID,
-          secondCryptoName, secondCryptoHP, path, battleID, element, data,
+          arrayToFront, firstCryptoName, firstCryptoHP, arrayBattleID, firstPlayerID,
+          secondPlayerID, secondCryptoName, secondCryptoHP, path, battleID, element, data,
         );
         if (result === 'endBattle') return;
       }
       if (match === null && data.status === 'DOWN') {
         secondCryptoHP--;
         const result = await this.handleSpecificBattle(
-          arrayToFront, firstCryptoName, firstCryptoHP, arrayBattleID,
-          secondCryptoName, secondCryptoHP, path, battleID, element, data,
+          arrayToFront, firstCryptoName, firstCryptoHP, arrayBattleID, firstPlayerID,
+          secondPlayerID, secondCryptoName, secondCryptoHP, path, battleID, element, data,
         );
         if (result === 'endBattle') return;
       }
       if (match !== null && data.status === 'UP') {
         secondCryptoHP--;
         const result = await this.handleSpecificBattle(
-          arrayToFront, firstCryptoName, firstCryptoHP, arrayBattleID,
-          secondCryptoName, secondCryptoHP, path, battleID, element, data,
+          arrayToFront, firstCryptoName, firstCryptoHP, arrayBattleID, firstPlayerID,
+          secondPlayerID, secondCryptoName, secondCryptoHP, path, battleID, element, data,
         );
         if (result === 'endBattle') return;
       }
       if (match !== null && data.status === 'DOWN') {
         firstCryptoHP--;
         const result = await this.handleSpecificBattle(
-          arrayToFront, firstCryptoName, firstCryptoHP, arrayBattleID,
-          secondCryptoName, secondCryptoHP, path, battleID, element, data,
+          arrayToFront, firstCryptoName, firstCryptoHP, arrayBattleID, firstPlayerID,
+          secondPlayerID, secondCryptoName, secondCryptoHP, path, battleID, element, data,
         );
         if (result === 'endBattle') return;
       }
@@ -146,7 +148,7 @@ class Widgets {
   }
 
   async handleSpecificBattle(
-    arrayToFront, firstCryptoName, firstCryptoHP, arrayBattleID,
+    arrayToFront, firstCryptoName, firstCryptoHP, arrayBattleID, firstPlayerID, secondPlayerID,
     secondCryptoName, secondCryptoHP, path, battleID, element, data,
   ) {
     arrayBattleID.push(battleID);
@@ -162,7 +164,7 @@ class Widgets {
       wssConnection.battleEnd({ battle: { id: battleID, healthPoints: { [`${firstCryptoName}`]: `${firstCryptoHP}`, [`${secondCryptoName}`]: `${secondCryptoHP}` } } });
       return 'endBattle';
     }
-    await addActualBattle({ path, value: `${firstCryptoName}/${firstCryptoHP}:${secondCryptoName}/${secondCryptoHP}` });
+    await addActualBattle({ path, value: `${firstCryptoName}/${firstCryptoHP}:${secondCryptoName}/${secondCryptoHP}:${firstPlayerID}:${secondPlayerID}` });
   }
 }
 

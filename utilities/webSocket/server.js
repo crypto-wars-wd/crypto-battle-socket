@@ -76,7 +76,7 @@ class WebSocket {
           if (result && result.battle) {
             sendStateBattle({ message: 'start_battle', battle: result.battle });
             const path = `${result.battle.firstPlayer.cryptoName}/${result.battle.secondPlayer.cryptoName}:${result.battle._id}`;
-            const value = `${result.battle.firstPlayer.cryptoName}/${result.battle.healthPoints}:${result.battle.secondPlayer.cryptoName}/${result.battle.healthPoints}`;
+            const value = `${result.battle.firstPlayer.cryptoName}/${result.battle.healthPoints}:${result.battle.secondPlayer.cryptoName}/${result.battle.healthPoints}:${result.battle.firstPlayer.playerID}:${result.battle.secondPlayer.playerID}`;
             await addActualBattle({ path, value });
           }
         } else {
