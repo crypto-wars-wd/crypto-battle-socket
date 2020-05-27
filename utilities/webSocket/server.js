@@ -66,7 +66,7 @@ class WebSocket {
         await this.connectUser(call);
         break;
       case 'create_battle':
-        await this.createBattle(call);
+        await this.createBattle(call, ws);
         break;
       case 'connect_battle':
         await this.connectBattle(call);
@@ -77,14 +77,30 @@ class WebSocket {
   }
 
   async connectUser(call) {
-    const { result: { battles: startedBattle }, error } = await getBattlesByState({ id: call.params.playerID, state: 'start' });
+    const { result: { battles: startedBattle }, error } = await getBattlesByState({
+      id: call.params.playerID,
+      state: 'start',
+    });
     if (error) console.error(error);
-    if (startedBattle[0]) {
+    if (startedBattle && startedBattle.length) {
       sendMessagesBattle({ battle: startedBattle[0], message: 'reconnect' });
     }
   }
 
-  async createBattle(call) {
+  async createBattle(call, ws) {
+    const { result: { battles: startedBattle }, error: getBattlesError } = await getBattlesByState({
+      id: call.params.playerID,
+      state: 'waiting',
+    });
+    if (startedBattle && startedBattle.length) {
+      return sendSomethingWrong({
+        ws,
+        call,
+        error: 'you already waiting for game',
+      });
+    }
+    if (getBattlesError) console.error(getBattlesError);
+
     const { result, error } = await createBattle({ call });
     if (error) console.error(error);
     if (result && result.battle) {
@@ -97,10 +113,22 @@ class WebSocket {
     if (error) console.error(error);
     if (result && result.battle) {
       sendStateBattle({ message: 'start_battle', battle: result.battle });
-      const path = `${result.battle.firstPlayer.cryptoName}/${result.battle.secondPlayer.cryptoName}:${result.battle._id}`;
-      const value = `${result.battle.firstPlayer.cryptoName}/${result.battle.healthPoints}:${result.battle.secondPlayer.cryptoName}/${result.battle.healthPoints}:${result.battle.firstPlayer.playerID}:${result.battle.secondPlayer.playerID}`;
+      const { path, value } = this.constructPathValue(result.battle);
       await addActualBattle({ path, value });
     }
+  }
+
+  constructPathValue(battle) {
+    const crypto1 = battle.firstPlayer.cryptoName;
+    const crypto2 = battle.secondPlayer.cryptoName;
+    const player1 = battle.firstPlayer.playerID;
+    const player2 = battle.secondPlayer.playerID;
+    const battleID = battle._id;
+    const hp = battle.healthPoints;
+    const path = `${crypto1}/${crypto2}:${battleID}`;
+    const value = `${crypto1}/${hp}:${crypto2}/${hp}:${player1}:${player2}`;
+
+    return { path, value };
   }
 
   sendToEveryone({ message, battles }) {

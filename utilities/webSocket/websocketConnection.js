@@ -107,45 +107,53 @@ class Widgets {
       let firstCryptoHP = parseInt(arr[0].split('/')[1]);
       let secondCryptoHP = parseInt(arr[1].split('/')[1]);
 
-      console.log(pathToRedis);
       if (match === null && data.status === 'UP') {
         firstCryptoHP--;
         await this.handleSpecificBattle(
-          arrayToFront, firstCryptoName, firstCryptoHP, arrayBattleID, firstPlayerID, secondPlayerID,
-          secondCryptoName, secondCryptoHP, pathToRedis, battleID, element, data, endedBattles,
+          arrayToFront, firstCryptoName, firstCryptoHP, arrayBattleID,
+          firstPlayerID, secondPlayerID, secondCryptoName, secondCryptoHP,
+          pathToRedis, battleID, element, data, endedBattles,
         );
       }
       if (match === null && data.status === 'DOWN') {
         secondCryptoHP--;
         await this.handleSpecificBattle(
-          arrayToFront, firstCryptoName, firstCryptoHP, arrayBattleID, firstPlayerID, secondPlayerID,
-          secondCryptoName, secondCryptoHP, pathToRedis, battleID, element, data, endedBattles,
+          arrayToFront, firstCryptoName, firstCryptoHP, arrayBattleID,
+          firstPlayerID, secondPlayerID, secondCryptoName, secondCryptoHP,
+          pathToRedis, battleID, element, data, endedBattles,
         );
       }
       if (match !== null && data.status === 'UP') {
         secondCryptoHP--;
         await this.handleSpecificBattle(
-          arrayToFront, firstCryptoName, firstCryptoHP, arrayBattleID, firstPlayerID, secondPlayerID,
-          secondCryptoName, secondCryptoHP, pathToRedis, battleID, element, data, endedBattles,
+          arrayToFront, firstCryptoName, firstCryptoHP, arrayBattleID,
+          firstPlayerID, secondPlayerID, secondCryptoName, secondCryptoHP,
+          pathToRedis, battleID, element, data, endedBattles,
         );
       }
       if (match !== null && data.status === 'DOWN') {
         firstCryptoHP--;
         await this.handleSpecificBattle(
-          arrayToFront, firstCryptoName, firstCryptoHP, arrayBattleID, firstPlayerID, secondPlayerID,
-          secondCryptoName, secondCryptoHP, pathToRedis, battleID, element, data, endedBattles,
+          arrayToFront, firstCryptoName, firstCryptoHP, arrayBattleID,
+          firstPlayerID, secondPlayerID, secondCryptoName, secondCryptoHP,
+          pathToRedis, battleID, element, data, endedBattles,
         );
       }
     }
     if (arrayToFront && arrayToFront.length) {
-      const { result } = await updateStatsBattle({ battles: arrayBattleID, steps: arrayToFront, endedBattles });
+      const { result } = await updateStatsBattle({
+        battles: arrayBattleID,
+        steps: arrayToFront,
+        endedBattles,
+      });
       wssConnection.sendToEveryone({ message: 'update_battle', battles: result.battles });
     }
   }
 
   async handleSpecificBattle(
-    arrayToFront, firstCryptoName, firstCryptoHP, arrayBattleID, firstPlayerID, secondPlayerID,
-    secondCryptoName, secondCryptoHP, pathToRedis, battleID, element, data, endedBattles,
+    arrayToFront, firstCryptoName, firstCryptoHP, arrayBattleID,
+    firstPlayerID, secondPlayerID, secondCryptoName, secondCryptoHP,
+    pathToRedis, battleID, element, data, endedBattles,
   ) {
     arrayBattleID.push(battleID);
     arrayToFront.push({
@@ -181,6 +189,6 @@ class Widgets {
   }
 }
 
-const widgetsCryptocompare = new Widgets(config.widgets.socketConnection, process.env.WIDGETS_KEY || 'ff0dd30d773722079f90f4686f91b0d5c82061f20f17e6817f6db6a7a1e071e3');
+const widgetsCryptocompare = new Widgets(config.widgets.socketConnection, process.env.WIDGETS_KEY || '');
 
 module.exports = widgetsCryptocompare;
