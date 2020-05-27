@@ -6,6 +6,6 @@ exports.connectBattle = async ({ call }) => axiosRequest({ url: `${config.apiUrl
 
 exports.createBattle = async ({ call }) => axiosRequest({ url: `${config.apiUrl}api/create-battle`, params: call.params, viewRequest: 'post' });
 
-exports.getBattlesByState = async (playerID = 'all') => axiosRequest({ url: `${config.apiUrl}api/show-battles-by-state/select?state=start&playerID=${playerID}`, viewRequest: 'get' });
+exports.getBattlesByState = async ({ id, state }) => axiosRequest({ url: `${config.apiUrl}api/get-battles?state=${state}&id=${id}`, viewRequest: 'get' });
 
 exports.updateStatsBattle = async ({ battles, steps, endedBattles }) => axiosRequest({ url: `${config.apiUrl}api/update-battles`, params: { battles, steps, endedBattles }, viewRequest: 'post' });
