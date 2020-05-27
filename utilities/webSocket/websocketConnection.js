@@ -32,7 +32,6 @@ class Widgets {
     };
   }
 
-
   onError(error) {
     console.error(`Connection ${error.target.url} errored, with message: `, error.message);
   }
@@ -40,7 +39,6 @@ class Widgets {
   onClose() {
     setTimeout(() => this.createWebSocketConnection(), 5000);
   }
-
 
   async onWebSocketMessage(data) {
     const msg = JSON.parse(data.trim());

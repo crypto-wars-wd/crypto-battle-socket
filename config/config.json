@@ -1,6 +1,6 @@
 {
   "production": {
-    "apiUrl": "http://localhost:3001/",
+    "apiUrl": "http://crypto-battle.pp.ua/api/",
     "widgets": {
       "socketConnection": "wss://streamer.cryptocompare.com/v2?api_key=",
       "server": {
