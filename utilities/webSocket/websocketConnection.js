@@ -91,9 +91,7 @@ class Widgets {
     const activeBattles = await getActiveBattleByCryptoName(msg.FROMSYMBOL);
     const arrayToFront = []; // rename steps
     const arrayBattleID = [];
-    const endedBattles = {
-      battleID: [], cryptoWin: [], cryptoLose: [], playerWin: [], playerLose: [],
-    };
+    const endedBattles = [];
 
     for (const element of activeBattles) {
       const splitElement = element.split(':');
@@ -159,20 +157,24 @@ class Widgets {
 
     if (firstCryptoHP <= 0) {
       await redisDel(element);
-      endedBattles.battleID.push(battleID);
-      endedBattles.cryptoWin.push(secondCryptoName);
-      endedBattles.cryptoLose.push(firstCryptoName);
-      endedBattles.playerWin.push(secondPlayerID);
-      endedBattles.playerLose.push(firstPlayerID);
+      endedBattles.push({
+        battleID,
+        cryptoWin: secondCryptoName,
+        cryptoLose: firstCryptoName,
+        playerWin: secondPlayerID,
+        playerLose: firstPlayerID,
+      });
       return;
     }
     if (secondCryptoHP <= 0) {
       await redisDel(element);
-      endedBattles.battleID.push(battleID);
-      endedBattles.cryptoWin.push(firstCryptoName);
-      endedBattles.cryptoLose.push(secondCryptoName);
-      endedBattles.playerWin.push(firstPlayerID);
-      endedBattles.playerLose.push(secondPlayerID);
+      endedBattles.push({
+        battleID,
+        cryptoWin: firstCryptoName,
+        cryptoLose: secondCryptoName,
+        playerWin: firstPlayerID,
+        playerLose: secondPlayerID,
+      });
       return;
     }
     await addActualBattle({ path: pathToRedis, value: `${firstCryptoName}/${firstCryptoHP}:${secondCryptoName}/${secondCryptoHP}:${firstPlayerID}:${secondPlayerID}` });
