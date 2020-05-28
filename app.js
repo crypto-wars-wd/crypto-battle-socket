@@ -1,5 +1,5 @@
 const widgetsQuotes = require('utilities/webSocket/websocketConnection');
 
-module.exports = (async () => {
+(async () => {
   await widgetsQuotes.createWebSocketConnection();
 })();

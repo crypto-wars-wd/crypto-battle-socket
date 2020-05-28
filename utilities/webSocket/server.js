@@ -119,14 +119,11 @@ class WebSocket {
   }
 
   constructPathValue(battle) {
-    const crypto1 = battle.firstPlayer.cryptoName;
-    const crypto2 = battle.secondPlayer.cryptoName;
-    const player1 = battle.firstPlayer.playerID;
-    const player2 = battle.secondPlayer.playerID;
-    const battleID = battle._id;
-    const hp = battle.healthPoints;
-    const path = `${crypto1}/${crypto2}:${battleID}`;
-    const value = `${crypto1}/${hp}:${crypto2}/${hp}:${player1}:${player2}`;
+    const {
+      firstPlayer: first, secondPlayer: second, _id, healthPoints: hp,
+    } = battle;
+    const path = `${first.cryptoName}/${second.cryptoName}:${_id}`;
+    const value = `${first.cryptoName}/${hp}:${second.cryptoName}/${hp}:${first.playerID}:${second.playerID}`;
 
     return { path, value };
   }

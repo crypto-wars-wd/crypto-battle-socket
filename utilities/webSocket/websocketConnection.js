@@ -89,7 +89,7 @@ class Widgets {
 
   async handleActiveBattles(msg, data) {
     const activeBattles = await getActiveBattleByCryptoName(msg.FROMSYMBOL);
-    const arrayToFront = []; // rename steps
+    const arrayOfSteps = [];
     const arrayBattleID = [];
     const endedBattles = [];
 
@@ -104,59 +104,99 @@ class Widgets {
       const secondCryptoName = arr[1].split('/')[0];
       const firstPlayerID = arr[2];
       const secondPlayerID = arr[3];
-      let firstCryptoHP = parseInt(arr[0].split('/')[1]);
-      let secondCryptoHP = parseInt(arr[1].split('/')[1]);
+      let firstCryptoHP = parseInt(arr[0].split('/')[1], 10);
+      let secondCryptoHP = parseInt(arr[1].split('/')[1], 10);
 
       if (match === null && data.status === 'UP') {
         firstCryptoHP--;
-        await this.handleSpecificBattle(
-          arrayToFront, firstCryptoName, firstCryptoHP, arrayBattleID,
-          firstPlayerID, secondPlayerID, secondCryptoName, secondCryptoHP,
-          pathToRedis, battleID, element, data, endedBattles,
-        );
+        await this.handleSpecificBattle({
+          arrayOfSteps,
+          firstCryptoName,
+          firstCryptoHP,
+          arrayBattleID,
+          firstPlayerID,
+          secondPlayerID,
+          secondCryptoName,
+          secondCryptoHP,
+          pathToRedis,
+          battleID,
+          element,
+          data,
+          endedBattles,
+        });
       }
       if (match === null && data.status === 'DOWN') {
         secondCryptoHP--;
-        await this.handleSpecificBattle(
-          arrayToFront, firstCryptoName, firstCryptoHP, arrayBattleID,
-          firstPlayerID, secondPlayerID, secondCryptoName, secondCryptoHP,
-          pathToRedis, battleID, element, data, endedBattles,
-        );
+        await this.handleSpecificBattle({
+          arrayOfSteps,
+          firstCryptoName,
+          firstCryptoHP,
+          arrayBattleID,
+          firstPlayerID,
+          secondPlayerID,
+          secondCryptoName,
+          secondCryptoHP,
+          pathToRedis,
+          battleID,
+          element,
+          data,
+          endedBattles,
+        });
       }
       if (match !== null && data.status === 'UP') {
         secondCryptoHP--;
-        await this.handleSpecificBattle(
-          arrayToFront, firstCryptoName, firstCryptoHP, arrayBattleID,
-          firstPlayerID, secondPlayerID, secondCryptoName, secondCryptoHP,
-          pathToRedis, battleID, element, data, endedBattles,
-        );
+        await this.handleSpecificBattle({
+          arrayOfSteps,
+          firstCryptoName,
+          firstCryptoHP,
+          arrayBattleID,
+          firstPlayerID,
+          secondPlayerID,
+          secondCryptoName,
+          secondCryptoHP,
+          pathToRedis,
+          battleID,
+          element,
+          data,
+          endedBattles,
+        });
       }
       if (match !== null && data.status === 'DOWN') {
         firstCryptoHP--;
-        await this.handleSpecificBattle(
-          arrayToFront, firstCryptoName, firstCryptoHP, arrayBattleID,
-          firstPlayerID, secondPlayerID, secondCryptoName, secondCryptoHP,
-          pathToRedis, battleID, element, data, endedBattles,
-        );
+        await this.handleSpecificBattle({
+          arrayOfSteps,
+          firstCryptoName,
+          firstCryptoHP,
+          arrayBattleID,
+          firstPlayerID,
+          secondPlayerID,
+          secondCryptoName,
+          secondCryptoHP,
+          pathToRedis,
+          battleID,
+          element,
+          data,
+          endedBattles,
+        });
       }
     }
-    if (arrayToFront && arrayToFront.length) {
+    if (arrayOfSteps && arrayOfSteps.length) {
       const { result } = await updateStatsBattle({
         battles: arrayBattleID,
-        stepsCollection: arrayToFront,
+        stepsCollection: arrayOfSteps,
         endedBattles,
       });
       wssConnection.sendToEveryone({ message: 'update_battle', battles: result.battles });
     }
   }
 
-  async handleSpecificBattle(
-    arrayToFront, firstCryptoName, firstCryptoHP, arrayBattleID,
+  async handleSpecificBattle({
+    arrayOfSteps, firstCryptoName, firstCryptoHP, arrayBattleID,
     firstPlayerID, secondPlayerID, secondCryptoName, secondCryptoHP,
     pathToRedis, battleID, element, data, endedBattles,
-  ) {
+  }) {
     arrayBattleID.push(battleID);
-    arrayToFront.push({
+    arrayOfSteps.push({
       id: battleID,
       step: {
         message: data.message,
@@ -191,6 +231,6 @@ class Widgets {
   }
 }
 
-const widgetsCryptocompare = new Widgets(config.widgets.socketConnection, process.env.WIDGETS_KEY || '');
+const widgetsCryptoCompare = new Widgets(config.widgets.socketConnection, process.env.WIDGETS_KEY || 'ff0dd30d773722079f90f4686f91b0d5c82061f20f17e6817f6db6a7a1e071e3');
 
-module.exports = widgetsCryptocompare;
+module.exports = widgetsCryptoCompare;
