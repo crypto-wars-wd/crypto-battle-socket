@@ -7,4 +7,4 @@ exports.createBattle = async ({ call }) => axiosRequest({ url: `${config.apiUrl}
 
 exports.getBattlesByState = async ({ id, state }) => axiosRequest({ url: `${config.apiUrl}api/get-battles?state=${state}&id=${id}`, viewRequest: 'get' });
 
-exports.updateStatsBattle = async ({ battles, steps, endedBattles }) => axiosRequest({ url: `${config.apiUrl}api/update-battles`, params: { battles, steps, endedBattles }, viewRequest: 'post' });
+exports.updateStatsBattle = async ({ battles, stepsCollection, endedBattles }) => axiosRequest({ url: `${config.apiUrl}api/update-battles`, params: { battles, stepsCollection, endedBattles }, viewRequest: 'post' });

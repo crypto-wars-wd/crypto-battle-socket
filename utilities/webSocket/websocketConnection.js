@@ -143,7 +143,7 @@ class Widgets {
     if (arrayToFront && arrayToFront.length) {
       const { result } = await updateStatsBattle({
         battles: arrayBattleID,
-        steps: arrayToFront,
+        stepsCollection: arrayToFront,
         endedBattles,
       });
       wssConnection.sendToEveryone({ message: 'update_battle', battles: result.battles });
@@ -158,9 +158,11 @@ class Widgets {
     arrayBattleID.push(battleID);
     arrayToFront.push({
       id: battleID,
-      message: data.message,
-      [`${firstCryptoName}`]: `${firstCryptoHP}`,
-      [`${secondCryptoName}`]: `${secondCryptoHP}`,
+      step: {
+        message: data.message,
+        [`${firstCryptoName}`]: `${firstCryptoHP}`,
+        [`${secondCryptoName}`]: `${secondCryptoHP}`,
+      },
     });
 
     if (firstCryptoHP <= 0) {
