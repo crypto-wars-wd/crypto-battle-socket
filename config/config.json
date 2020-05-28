@@ -1,0 +1,44 @@
+{
+  "production": {
+    "apiUrl": "http://crypto-battle.pp.ua/api/",
+    "widgets": {
+      "socketConnection": "wss://streamer.cryptocompare.com/v2?api_key=",
+      "server": {
+        "bitfinex": "2~Bitfinex",
+        "binance": "2~Binance",
+        "P2PB2B": "2~P2PB2B"
+      }
+    },
+    "redis": {
+      "widgetsRate": 1
+    }
+  },
+  "development": {
+    "apiUrl": "http://localhost:3001/",
+    "widgets": {
+      "socketConnection": "wss://streamer.cryptocompare.com/v2?api_key=",
+      "server": {
+        "bitfinex": "2~Bitfinex",
+        "binance": "2~Binance",
+        "P2PB2B": "2~P2PB2B"
+      }
+    },
+    "redis": {
+      "widgetsRate": 1
+    }
+  },
+  "test": {
+    "apiUrl": "http://localhost:3001/",
+    "widgetsBeaxy": {
+      "socketConnection": "wss://wgt-srv0.beaxy",
+      "server": {
+        "bitfinex": "2~Bitfinex",
+        "binance": "2~Binance",
+        "P2PB2B": "2~P2PB2B"
+      }
+    },
+    "redis": {
+      "widgetsRate": 1
+    }
+  }
+}

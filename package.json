@@ -3,15 +3,19 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "node ./bin/www"
+    "start": "NODE_PATH=. node app.js"
   },
   "dependencies": {
-    "cookie-parser": "~1.4.4",
+    "@hapi/joi": "^17.1.1",
+    "axios": "^0.19.2",
+    "bluebird": "^3.7.2",
     "debug": "~2.6.9",
     "express": "~4.16.1",
-    "http-errors": "~1.6.3",
-    "morgan": "~1.9.1",
-    "pug": "2.0.0-beta11"
+    "lodash": "^4.17.5",
+    "moment": "^2.25.3",
+    "mongoose": "^5.9.12",
+    "redis": "^3.0.2",
+    "ws": "^4.1.0"
   },
   "devDependencies": {
     "eslint": "^6.8.0",
