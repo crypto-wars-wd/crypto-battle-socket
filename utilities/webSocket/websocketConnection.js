@@ -233,6 +233,6 @@ class Widgets {
   }
 }
 
-const widgetsCryptoCompare = new Widgets(config.widgets.socketConnection, process.env.WIDGETS_KEY || 'ff0dd30d773722079f90f4686f91b0d5c82061f20f17e6817f6db6a7a1e071e3');
+const widgetsCryptoCompare = new Widgets(config.widgets.socketConnection, process.env.WIDGETS_KEY || '');
 
 module.exports = widgetsCryptoCompare;
