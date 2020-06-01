@@ -1,5 +1,6 @@
 const SocketServer = require('ws').Server;
 const _ = require('lodash');
+const { messages } = require('utilities/constants');
 const { addActualBattle } = require('utilities/redis/redisSetter');
 const {
   createBattle, connectBattle, getBattlesByState,
@@ -112,6 +113,7 @@ class WebSocket {
   }
 
   async connectBattle(call) {
+    call.params.message = messages.starter();
     const { result, error } = await connectBattle({ call });
     if (error) console.error(error);
     if (result && result.battle) {
