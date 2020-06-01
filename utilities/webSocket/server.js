@@ -71,6 +71,9 @@ class WebSocket {
       case 'connect_battle':
         await this.connectBattle(call);
         break;
+      case 'ping':
+        this.pong(ws);
+        break;
       default:
         sendSomethingWrong({ call, ws, error: 'Something is wrong' });
     }
@@ -116,6 +119,10 @@ class WebSocket {
       const { path, value } = this.constructPathValue(result.battle);
       await addActualBattle({ path, value });
     }
+  }
+
+  pong(ws) {
+    ws.send(JSON.stringify({ message: 'pong' }));
   }
 
   constructPathValue(battle) {
