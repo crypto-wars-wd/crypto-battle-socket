@@ -76,7 +76,7 @@ class Widgets {
     };
     if (pastTick && pastTick.price < msg.PRICE) {
       data.status = 'UP';
-      data.message = `${msg.FROMSYMBOL} ${messages.hit()}`;
+      data.message = `${msg.FROMSYMBOL} ${messages.hit(msg.FROMSYMBOL)}`;
     }
     if (pastTick && pastTick.price > msg.PRICE) {
       data.status = 'DOWN';
@@ -214,6 +214,7 @@ class Widgets {
         playerWin: secondPlayerID,
         playerLose: firstPlayerID,
       });
+      arrayOfSteps.push({ id: battleID, step: { message: messages.finisher(secondCryptoName) } });
       return;
     }
     if (secondCryptoHP <= 0) {
@@ -225,6 +226,7 @@ class Widgets {
         playerWin: firstPlayerID,
         playerLose: secondPlayerID,
       });
+      arrayOfSteps.push({ id: battleID, step: { message: messages.finisher(firstCryptoName) } });
       return;
     }
     await addActualBattle({ path: pathToRedis, value: `${firstCryptoName}/${firstCryptoHP}:${secondCryptoName}/${secondCryptoHP}:${firstPlayerID}:${secondPlayerID}` });

@@ -1,5 +1,6 @@
 const SocketServer = require('ws').Server;
 const _ = require('lodash');
+const { messages } = require('utilities/constants');
 const { addActualBattle } = require('utilities/redis/redisSetter');
 const {
   createBattle, connectBattle, getBattlesByState,
@@ -71,6 +72,9 @@ class WebSocket {
       case 'connect_battle':
         await this.connectBattle(call);
         break;
+      case 'ping':
+        this.pong(ws);
+        break;
       default:
         sendSomethingWrong({ call, ws, error: 'Something is wrong' });
     }
@@ -88,18 +92,13 @@ class WebSocket {
   }
 
   async createBattle(call, ws) {
-    const { result: { battles: startedBattle }, error: getBattlesError } = await getBattlesByState({
-      id: call.params.playerID,
-      state: 'waiting',
-    });
-    if (startedBattle && startedBattle.length) {
+    if (await this.checkBattles(call)) {
       return sendSomethingWrong({
         ws,
         call,
-        error: 'you already waiting for game',
+        error: 'you already have active battle',
       });
     }
-    if (getBattlesError) console.error(getBattlesError);
 
     const { result, error } = await createBattle({ call });
     if (error) console.error(error);
@@ -109,6 +108,7 @@ class WebSocket {
   }
 
   async connectBattle(call) {
+    call.params.message = messages.starter(call.params.cryptoName);
     const { result, error } = await connectBattle({ call });
     if (error) console.error(error);
     if (result && result.battle) {
@@ -116,6 +116,10 @@ class WebSocket {
       const { path, value } = this.constructPathValue(result.battle);
       await addActualBattle({ path, value });
     }
+  }
+
+  pong(ws) {
+    ws.send(JSON.stringify({ message: 'pong' }));
   }
 
   constructPathValue(battle) {
@@ -126,6 +130,20 @@ class WebSocket {
     const value = `${first.cryptoName}/${hp}:${second.cryptoName}/${hp}:${first.playerID}:${second.playerID}`;
 
     return { path, value };
+  }
+
+  async checkBattles(call) {
+    const { result: { battles: waiting }, error: getBattlesError } = await getBattlesByState({
+      id: call.params.playerID,
+      state: 'waiting',
+    });
+    if (getBattlesError) console.error(getBattlesError);
+    const { result: { battles: started }, error: getBattlesErrorstart } = await getBattlesByState({
+      id: call.params.playerID,
+      state: 'start',
+    });
+    if (getBattlesErrorstart) console.error(getBattlesErrorstart);
+    return !!(waiting && waiting.length || started && started.length);
   }
 
   sendToEveryone({ message, battles }) {
