@@ -76,7 +76,7 @@ class Widgets {
     };
     if (pastTick && pastTick.price < msg.PRICE) {
       data.status = 'UP';
-      data.message = `${msg.FROMSYMBOL} ${messages.hit()}`;
+      data.message = `${msg.FROMSYMBOL} ${messages.hit(msg.FROMSYMBOL)}`;
     }
     if (pastTick && pastTick.price > msg.PRICE) {
       data.status = 'DOWN';
@@ -214,6 +214,7 @@ class Widgets {
         playerWin: secondPlayerID,
         playerLose: firstPlayerID,
       });
+      arrayOfSteps.push({ id: battleID, step: { message: messages.finisher() } });
       return;
     }
     if (secondCryptoHP <= 0) {
@@ -225,12 +226,13 @@ class Widgets {
         playerWin: firstPlayerID,
         playerLose: secondPlayerID,
       });
+      arrayOfSteps.push({ id: battleID, step: { message: messages.finisher() } });
       return;
     }
     await addActualBattle({ path: pathToRedis, value: `${firstCryptoName}/${firstCryptoHP}:${secondCryptoName}/${secondCryptoHP}:${firstPlayerID}:${secondPlayerID}` });
   }
 }
 
-const widgetsCryptoCompare = new Widgets(config.widgets.socketConnection, process.env.WIDGETS_KEY || '');
+const widgetsCryptoCompare = new Widgets(config.widgets.socketConnection, process.env.WIDGETS_KEY || 'ff0dd30d773722079f90f4686f91b0d5c82061f20f17e6817f6db6a7a1e071e3');
 
 module.exports = widgetsCryptoCompare;
