@@ -4,19 +4,16 @@ exports.hit = (cryptoName) => {
   const message = _.concat(battleMessages.common.singleAttack, battleMessages[`${cryptoName}`].singleAttack);
   return _.sample(message);
 };
-exports.getHit = () => _.sample(getHitMessages);
+exports.getHit = () => _.sample(battleMessages.common.getHit);
 exports.starter = () => _.sample(battleMessages.common.starter);
 exports.finisher = () => _.sample(battleMessages.common.finisher);
-
-const getHitMessages = [
-  'пропустил удар',
-];
 
 const battleMessages = {
   common: {
     starter: [
       'Приветствую! Я заберу все твои деньги и жизнь!',
-      'Зазвучал горн, воины пустились в смертельную схватку'],
+      'Зазвучал горн, воины пустились в смертельную схватку'
+    ],
     singleAttack: [
       'Обрушивает на врага град быстрых ударов',
       'Бросает камень в лицо неприятелю ',
@@ -30,6 +27,9 @@ const battleMessages = {
       'Быстро парируя, наносит удар ногой',
       'Наносит удар кулаком в нос',
       'Наступая, сбивает врага с ног подсечкой',
+    ],
+    getHit: [
+      'пропустил удар',
     ],
     finisher: [
       'Зрители надолго запомнят этот бой, в трактирах еще долго обсуждали эту  битву',
