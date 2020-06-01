@@ -108,7 +108,7 @@ class WebSocket {
   }
 
   async connectBattle(call) {
-    call.params.message = messages.starter();
+    call.params.message = messages.starter(call.params.cryptoName);
     const { result, error } = await connectBattle({ call });
     if (error) console.error(error);
     if (result && result.battle) {

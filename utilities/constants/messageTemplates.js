@@ -4,9 +4,15 @@ exports.hit = (cryptoName) => {
   const message = _.concat(battleMessages.common.singleAttack, battleMessages[`${cryptoName}`].singleAttack);
   return _.sample(message);
 };
+exports.finisher = (cryptoName) => {
+  const message = _.concat(battleMessages.common.finisher, battleMessages[`${cryptoName}`].finisher);
+  return _.sample(message);
+};
+exports.starter = (cryptoName) => {
+  const message = _.concat(battleMessages.common.starter, battleMessages[`${cryptoName}`].starter);
+  return _.sample(message);
+};
 exports.getHit = () => _.sample(battleMessages.common.getHit);
-exports.starter = () => _.sample(battleMessages.common.starter);
-exports.finisher = () => _.sample(battleMessages.common.finisher);
 
 const battleMessages = {
   common: {
@@ -39,68 +45,68 @@ const battleMessages = {
     ],
   },
   BTC: {
-    starter: ['BTC starter'],
+    starter: [],
     singleAttack: ['Наносит неожиданный удар копьем в голову'],
-    finisher: ['BTC finisher'],
+    finisher: [],
   },
   BAT: {
-    starter: ['BAT starter'],
+    starter: [],
     singleAttack: ['Достает двойные мечи и молниеносно бьет по ногам'],
-    finisher: ['BAT finisher'],
+    finisher: [],
   },
   BCH: {
-    starter: ['BCH starter'],
+    starter: [],
     singleAttack: ['Распахнув крылья в полете, быстрым движением бьет противника по руке'],
-    finisher: ['BCH finisher'],
+    finisher: [],
   },
   DASH: {
-    starter: ['DASH starter'],
+    starter: [],
     singleAttack: ['Точным выстрелом попадает в плечо соперника'],
-    finisher: ['DASH finisher'],
+    finisher: [],
   },
   EOS: {
-    starter: ['EOS starter'],
+    starter: [],
     singleAttack: ['Раскручивая булаву, бьет сильнейшим ударом по земле и отбрасывает противника'],
-    finisher: ['EOS finisher'],
+    finisher: [],
   },
   ETH: {
-    starter: ['ETH starter'],
+    starter: [],
     singleAttack: ['Натягивая тетиву твердой рукой, резко выстрелил точно в ребро, куда и планировал'],
-    finisher: ['ETH finisher'],
+    finisher: [],
   },
   LTC: {
-    starter: ['LTC starter'],
+    starter: [],
     singleAttack: ['Подскочил на коне, нанеся урон копытом по голове'],
-    finisher: ['LTC finisher'],
+    finisher: [],
   },
   NEO: {
-    starter: ['NEO starter'],
+    starter: [],
     singleAttack: ['В состоянии безумия начала очень быстро рубить топором, тем самым нанося не смертельные но болезненные раны противнику'],
-    finisher: ['NEO finisher'],
+    finisher: [],
   },
   WAVES: {
-    starter: ['WAVES starter'],
+    starter: [],
     singleAttack: ['Бездумно несясь на стоящего противника, сбивает его с ног'],
-    finisher: ['WAVES finisher'],
+    finisher: [],
   },
   XMR: {
-    starter: ['XMR starter'],
-    singleAttack: [' singleAttack'],
-    finisher: ['XMR finisher'],
+    starter: [],
+    singleAttack: ['Наносит неожиданный удар копьем в голову'],
+    finisher: [],
   },
   ZEC: {
-    starter: ['ZEC starter'],
+    starter: [],
     singleAttack: ['Блокируя удар противника щитом и резко отталкиваясь от земли ногами, наносит апперкот прикладом меча в бороду'],
-    finisher: ['ZEC finisher'],
+    finisher: [],
   },
   XRP: {
-    starter: ['XRP starter'],
+    starter: [],
     singleAttack: ['очень ловко метнула свой удлиненный кинжал и не промахнулась'],
-    finisher: ['XRP finisher'],
+    finisher: [],
   },
   ZRX: {
-    starter: ['ZRX starter'],
+    starter: [],
     singleAttack: ['грациозно виляя плащом, начала кружиться с двумя клинками словно юла не оставив и шанса заблокировать свой удар'],
-    finisher: ['ZRX finisher'],
+    finisher: [],
   },
 };
