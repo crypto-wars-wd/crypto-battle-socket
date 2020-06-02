@@ -202,6 +202,8 @@ class Widgets {
         message: data.message,
         [`${firstCryptoName}`]: `${firstCryptoHP}`,
         [`${secondCryptoName}`]: `${secondCryptoHP}`,
+        status: data.status,
+        price: data.price,
       },
     });
 
