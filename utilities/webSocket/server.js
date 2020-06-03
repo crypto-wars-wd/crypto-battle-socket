@@ -54,8 +54,7 @@ class WebSocket {
         await this.onWebSocketMessage(message, ws);
       });
       ws.on('error', (err) => {
-        console.error('Caught flash policy server socket error: ');
-        console.error(err);
+        console.error('Caught flash policy server socket error: ', err.stack);
       });
     });
   }
