@@ -98,17 +98,13 @@ class WebSocket {
   async createBattle(call, ws) {
     const { validated, validationError } = validators
       .validate(call, validators.battle.createBattleSchema);
-    if (validationError) {
-      return sendSomethingWrong({ ws, call, error: validationError });
-    }
-    if (await this.checkBattles(validated)) {
+    if (validationError || await this.checkBattles(validated)) {
       return sendSomethingWrong({
         ws,
         call,
-        error: 'you already have active battle',
+        error: validationError || 'you already have active battle',
       });
     }
-
     const { result, error } = await createBattle({ call: validated });
     if (error) console.error(error);
     if (result && result.battle) {
