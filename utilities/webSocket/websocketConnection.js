@@ -204,6 +204,7 @@ class Widgets {
         [`${secondCryptoName}`]: `${secondCryptoHP}`,
         status: data.status,
         price: data.price,
+        updateAt: data.lastUpdate,
       },
     });
 
