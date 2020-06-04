@@ -4,4 +4,4 @@ exports.addActualWidgetRate = async ({ widget, data }) => widgetsRate.setAsync(`
 
 exports.addActualBattle = async ({ path, value }) => widgetsRate.setAsync(`actual_battle:${path}`, value);
 
-exports.redisDel = async (path) => await widgetsRate.del(path)
+exports.redisDel = async (path) => await widgetsRate.del(path);

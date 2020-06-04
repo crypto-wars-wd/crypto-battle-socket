@@ -5,6 +5,7 @@ const { addActualBattle } = require('utilities/redis/redisSetter');
 const {
   createBattle, connectBattle, getBattlesByState,
 } = require('utilities/helpers/axiosRequestHelper');
+const validators = require('utilities/validators');
 
 const wss = new SocketServer({ port: 4000, path: '/socket' });
 
@@ -52,6 +53,9 @@ class WebSocket {
       ws.on('message', async (message) => {
         await this.onWebSocketMessage(message, ws);
       });
+      ws.on('error', (err) => {
+        console.error('Caught flash policy server socket error: ', err.stack);
+      });
     });
   }
 
@@ -70,7 +74,7 @@ class WebSocket {
         await this.createBattle(call, ws);
         break;
       case 'connect_battle':
-        await this.connectBattle(call);
+        await this.connectBattle(call, ws);
         break;
       case 'ping':
         this.pong(ws);
@@ -92,24 +96,30 @@ class WebSocket {
   }
 
   async createBattle(call, ws) {
-    if (await this.checkBattles(call)) {
+    const { validated, validationError } = validators
+      .validate(call, validators.battle.createBattleSchema);
+    if (validationError || await this.checkBattles(validated)) {
       return sendSomethingWrong({
         ws,
         call,
-        error: 'you already have active battle',
+        error: validationError || 'you already have active battle',
       });
     }
-
-    const { result, error } = await createBattle({ call });
+    const { result, error } = await createBattle({ call: validated });
     if (error) console.error(error);
     if (result && result.battle) {
       sendStateBattle({ message: 'create_battle', battle: result.battle });
     }
   }
 
-  async connectBattle(call) {
-    call.params.message = messages.starter(call.params.cryptoName);
-    const { result, error } = await connectBattle({ call });
+  async connectBattle(call, ws) {
+    const { validated, validationError } = validators
+      .validate(call, validators.battle.connectBattleShcema);
+    if (validationError) {
+      return sendSomethingWrong({ ws, call, error: validationError });
+    }
+    validated.params.message = messages.starter(validated.params.cryptoName);
+    const { result, error } = await connectBattle({ call: validated });
     if (error) console.error(error);
     if (result && result.battle) {
       sendStateBattle({ message: 'start_battle', battle: result.battle });
