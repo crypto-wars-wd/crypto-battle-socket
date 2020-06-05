@@ -143,17 +143,22 @@ class WebSocket {
   }
 
   async checkBattles(call) {
-    const { result: { battles: waiting }, error: getBattlesError } = await getBattlesByState({
-      id: call.params.playerID,
-      state: 'waiting',
-    });
-    if (getBattlesError) console.error(getBattlesError);
-    const { result: { battles: started }, error: getBattlesErrorstart } = await getBattlesByState({
-      id: call.params.playerID,
-      state: 'start',
-    });
+    const { battles: waiting, error: getBattlesError } = await this.checkBattleState(call, 'waiting');
+    if (getBattlesError) return console.error(getBattlesError);
+    const { battles: started, error: getBattlesErrorstart } = await this.checkBattleState(call, 'start');
     if (getBattlesErrorstart) console.error(getBattlesErrorstart);
+
     return !!(waiting && waiting.length || started && started.length);
+  }
+
+  async checkBattleState(call, state) {
+    const { result, error } = await getBattlesByState({
+      id: call.params.playerID,
+      state,
+    });
+    if (error) return { error };
+
+    return { battles: result.battles };
   }
 
   sendToEveryone({ message, battles }) {
