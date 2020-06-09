@@ -10,7 +10,7 @@ exports.createBattleSchema = Joi.object().keys({
       .required(),
     playerID: Joi.string().required(),
     healthPoints: Joi.number().min(1).required(),
-    betType: Joi.string().valid('HIVE', 'HBD', 'STEEM', 'SBD'),
+    betType: Joi.string().valid('HIVE', 'HBD'),
     amount: Joi.number().min(1),
   }).with('betType', 'amount').with('amount', 'betType'),
 }).options(options);
@@ -23,7 +23,7 @@ exports.connectBattleShcema = Joi.object().keys({
       .required(),
     playerID: Joi.string().required(),
     battleID: Joi.string().required(),
-    betType: Joi.string().valid('HIVE', 'HBD', 'STEEM', 'SBD'),
+    betType: Joi.string().valid('HIVE', 'HBD'),
     amount: Joi.number().min(1),
   }).with('betType', 'amount').with('amount', 'betType'),
 }).options(options);
