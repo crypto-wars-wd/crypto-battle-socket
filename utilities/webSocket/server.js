@@ -143,15 +143,15 @@ class WebSocket {
   }
 
   async checkBattles(call) {
-    const { battles: waiting, error: getBattlesError } = await this.checkBattleState(call, 'waiting');
+    const { battles: waiting, error: getBattlesError } = await this.getBattles(call, 'waiting');
     if (getBattlesError) return console.error(getBattlesError);
-    const { battles: started, error: getBattlesErrorstart } = await this.checkBattleState(call, 'start');
+    const { battles: started, error: getBattlesErrorstart } = await this.getBattles(call, 'start');
     if (getBattlesErrorstart) console.error(getBattlesErrorstart);
 
     return !!(waiting && waiting.length || started && started.length);
   }
 
-  async checkBattleState(call, state) {
+  async getBattles(call, state) {
     const { result, error } = await getBattlesByState({
       id: call.params.playerID,
       state,
